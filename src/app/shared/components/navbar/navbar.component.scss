@@ -1,0 +1,77 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1a2744;
+  padding: 0 24px;
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+  }
+
+  &__logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #2dd4bf;
+    color: #1a2744;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  &__user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__nombre {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__rol {
+    color: #94a3b8;
+    font-size: 12px;
+  }
+
+  &__logout {
+    background: transparent;
+    border: 1px solid #94a3b8;
+    color: #94a3b8;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: white;
+      color: white;
+    }
+  }
+}

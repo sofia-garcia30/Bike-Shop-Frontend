@@ -1,0 +1,21 @@
+<nav class="navbar">
+  <div class="navbar__logo">
+    <span class="navbar__logo-icon">🚲</span>
+    <span class="navbar__logo-text">Bike Shop</span>
+  </div>
+
+  <div class="navbar__right">
+    <div class="navbar__avatar">
+      {{ getIniciales() }}
+    </div>
+
+    <div class="navbar__user-info">
+      <span class="navbar__nombre">{{ usuario?.nombre }}</span>
+      <span class="navbar__rol">{{ usuario?.rol }}</span>
+    </div>
+
+    <button class="navbar__logout" (click)="logout()">
+      Cerrar sesión
+    </button>
+  </div>
+</nav>
