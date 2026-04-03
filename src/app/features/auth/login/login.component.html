@@ -1,1 +1,95 @@
-﻿<p>LoginComponent funcionando</p>
+﻿<div class="min-h-screen bg-surface-container-low flex flex-col">
+
+  <main class="flex-grow flex items-center justify-center px-4 py-16 relative overflow-hidden">
+
+    <!-- Fondo decorativo -->
+    <div class="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
+      <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-gradient-to-br from-primary-container to-secondary opacity-10 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gradient-to-tr from-secondary to-primary opacity-10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="w-full max-w-md z-10">
+
+      <!-- Logo -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-container text-white rounded-xl mb-6 shadow-lg">
+          <span class="material-symbols-outlined text-3xl">pedal_bike</span>
+        </div>
+        <h1 class="text-primary font-bold text-2xl tracking-tighter uppercase mb-1">
+          Bike Shop
+        </h1>
+        <p class="text-primary-container text-[0.75rem] tracking-[0.2em] font-medium uppercase">
+          Sistema de Gestión
+        </p>
+      </div>
+
+      <!-- Card Login -->
+      <div class="bg-surface-container-lowest rounded-xl shadow-sm p-8 border border-outline-variant/10">
+
+        <!-- Error -->
+        <div *ngIf="error"
+             class="mb-6 p-4 bg-error-container text-error rounded-xl text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">error</span>
+          {{ error }}
+        </div>
+
+        <div class="space-y-6">
+
+          <!-- Email -->
+          <div>
+            <label class="block text-on-surface-variant text-[0.75rem] uppercase tracking-wider mb-2">
+              Correo Electrónico
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">
+                mail
+              </span>
+              <input
+                type="email"
+                [(ngModel)]="email"
+                placeholder="usuario@bikeshop.com"
+                class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-on-surface-variant text-[0.75rem] uppercase tracking-wider mb-2">
+              Contraseña
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">
+                lock
+              </span>
+              <input
+                type="password"
+                [(ngModel)]="password"
+                placeholder="••••••••"
+                class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Botón -->
+          <button
+            (click)="login()"
+            [disabled]="cargando"
+            class="w-full bg-primary-container text-white font-semibold py-4 px-6 rounded-xl shadow-md hover:bg-secondary hover:shadow-lg active:scale-[0.98] transition-all duration-300 uppercase tracking-widest text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <span *ngIf="cargando" class="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+            {{ cargando ? 'Iniciando...' : 'Iniciar Sesión' }}
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-8 text-center">
+        <p class="text-outline text-[0.65rem] tracking-[0.3em] uppercase">
+          Bike Shop © 2025
+        </p>
+      </div>
+
+    </div>
+  </main>
+</div>
