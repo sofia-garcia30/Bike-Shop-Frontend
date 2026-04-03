@@ -1,0 +1,18 @@
+<div class="flex min-h-screen bg-surface">
+
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Contenido principal -->
+  <div class="flex-1 ml-64 flex flex-col min-h-screen transition-all duration-300">
+
+    <!-- Navbar -->
+    <app-navbar></app-navbar>
+
+    <!-- Página activa -->
+    <main class="flex-1 p-8 mt-16">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>
