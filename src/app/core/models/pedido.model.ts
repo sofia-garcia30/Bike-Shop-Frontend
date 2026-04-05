@@ -13,3 +13,15 @@ export interface DetallePedido {
   cantidad: number;
   precioCostoUnitario: number;
 }
+
+export interface PedidoRequest {
+  idProveedor: number;
+  detalles: DetallePedidoRequest[];
+}
+ 
+export interface DetallePedidoRequest {
+  codigoBicicleta: number;
+  cantidad: number;
+  precioCostoUnitario: number;
+  nombreBicicleta?: string;
+}

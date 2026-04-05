@@ -1,1 +1,66 @@
-﻿<p>DashboardComponent funcionando</p>
+﻿<div class="dashboard-container">
+  <h1>Dashboard</h1>
+
+  <!-- 🔥 BOTONES DE REPORTES SEGÚN ROL -->
+  <div class="report-buttons">
+    <!-- ADMIN: reportes globales -->
+    <ng-container *ngIf="isAdmin">
+      <button (click)="descargarReporteVentas()" class="btn-primary">📊 Reporte Ventas</button>
+      <button (click)="descargarReporteInventario()" class="btn-primary">📈 Reporte Inventario</button>
+      <button (click)="descargarReportePedidos()" class="btn-primary">📋 Reporte Pedidos</button>
+    </ng-container>
+    
+    <!-- EMPLEADO: solo mis ventas -->
+    <button *ngIf="isEmpleado" (click)="descargarMisVentas()" class="btn-primary">📄 Mis Ventas</button>
+  </div>
+
+  <!-- 📊 CARGANDO -->
+  <div *ngIf="loading" class="loading">Cargando datos...</div>
+
+  <!-- 📊 MÉTRICAS (ambos roles ven) -->
+  <div *ngIf="!loading" class="metrics-grid">
+    <div class="metric-card">
+      <h3>Total Ventas</h3>
+      <p>{{ metrics.totalVentas | number }}</p>
+    </div>
+    <div class="metric-card">
+      <h3>Total Clientes</h3>
+      <p>{{ metrics.totalClientes | number }}</p>
+    </div>
+    <div class="metric-card">
+      <h3>Total Bicicletas</h3>
+      <p>{{ metrics.totalBicicletas | number }}</p>
+    </div>
+    <div class="metric-card">
+      <h3>Stock Bajo</h3>
+      <p>{{ metrics.stockBajo | number }}</p>
+    </div>
+    <div class="metric-card">
+      <h3>Sin Stock</h3>
+      <p>{{ metrics.sinStock | number }}</p>
+    </div>
+  </div>
+
+  <!-- 🏆 TOP BICICLETAS (solo ADMIN) -->
+  <div *ngIf="isAdmin && !loading && topBicicletas.length > 0" class="top-bikes">
+    <h2>Top bicicletas más vendidas</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Unidades vendidas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bike of topBicicletas">
+          <td>{{ bike.codigo }}</td>
+          <td>{{ bike.marca }}</td>
+          <td>{{ bike.modelo }}</td>
+          <td>{{ bike.totalVendido }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
