@@ -6,6 +6,7 @@ import { Bicicleta } from '../../core/models/bicicleta.model';
 import { ToastService } from '../../shared/components/toast/toast.service';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { BicicletaFormComponent } from './bicicleta-form/bicicleta-form.component';
+import { AuthService } from '../../core/services/auth.service';  // ← AGREGAR
 
 @Component({
   selector: 'app-bicicletas',
@@ -18,10 +19,14 @@ export class BicicletasComponent implements OnInit {
   private bicicletaService = inject(BicicletaService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);  // ← AGREGAR
 
   bicicletas: Bicicleta[] = [];
   filtradas: Bicicleta[] = [];
   cargando = true;
+  
+  // 🔥 Variable para controlar permisos
+  isAdmin = false;
 
   filtroBusqueda = '';
   filtroMarca = '';
@@ -38,6 +43,8 @@ export class BicicletasComponent implements OnInit {
   bicicletaEditar: Bicicleta | null = null;
 
   ngOnInit(): void {
+    // 🔥 Obtener el rol del usuario
+    this.isAdmin = this.authService.isAdmin();
     this.cargarBicicletas();
   }
 
@@ -96,10 +103,10 @@ export class BicicletasComponent implements OnInit {
 
   abrirFormNuevo(): void {
     this.bicicletaEditar = null;
-    this.showFormModal = false;          // resetear primero
-    this.cdr.detectChanges();            // forzar ciclo con false
+    this.showFormModal = false;
+    this.cdr.detectChanges();
     setTimeout(() => {
-      this.showFormModal = true;         // abrir en el siguiente tick
+      this.showFormModal = true;
       this.cdr.detectChanges();
     }, 0);
   }
@@ -117,7 +124,6 @@ export class BicicletasComponent implements OnInit {
   onImagenError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
-    // Muestra el contenedor del ícono que está justo antes
     const contenedor = img.parentElement;
     if (contenedor) {
       contenedor.innerHTML = `

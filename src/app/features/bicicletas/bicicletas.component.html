@@ -9,7 +9,7 @@
       {{ filtradas.length }} bicicletas encontradas
     </p>
   </div>
-  <button
+  <button *ngIf="isAdmin"
     (click)="abrirFormNuevo()"
     class="bg-[#0b2b5e] text-white px-6 py-2.5 rounded-xl font-semibold text-sm
            flex items-center gap-2 hover:bg-[#00173d] transition-all shadow-lg active:scale-95"

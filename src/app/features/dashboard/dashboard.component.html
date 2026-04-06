@@ -1,66 +1,120 @@
 ﻿<div class="dashboard-container">
-  <h1>Dashboard</h1>
-
-  <!-- 🔥 BOTONES DE REPORTES SEGÚN ROL -->
-  <div class="report-buttons">
-    <!-- ADMIN: reportes globales -->
-    <ng-container *ngIf="isAdmin">
-      <button (click)="descargarReporteVentas()" class="btn-primary">📊 Reporte Ventas</button>
-      <button (click)="descargarReporteInventario()" class="btn-primary">📈 Reporte Inventario</button>
-      <button (click)="descargarReportePedidos()" class="btn-primary">📋 Reporte Pedidos</button>
-    </ng-container>
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <span class="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-[#006970] mb-1 block">
+        Digital Atelier
+      </span>
+      <h2 class="text-3xl font-bold text-[#00173d] tracking-tight">Dashboard</h2>
+      <p class="text-sm text-[#44474f] mt-1">
+        Resumen general del sistema
+      </p>
+    </div>
     
-    <!-- EMPLEADO: solo mis ventas -->
-    <button *ngIf="isEmpleado" (click)="descargarMisVentas()" class="btn-primary">📄 Mis Ventas</button>
+    <!-- 🔥 BOTONES DE REPORTES SEGÚN ROL -->
+    <div class="flex gap-3">
+      <ng-container *ngIf="isAdmin">
+        <button (click)="descargarReporteVentas()" 
+                class="bg-white border border-[#c4c6d1]/20 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#00173d] hover:bg-[#f2f4f7] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+          Reporte Ventas
+        </button>
+        <button (click)="descargarReporteInventario()" 
+                class="bg-white border border-[#c4c6d1]/20 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#00173d] hover:bg-[#f2f4f7] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">table_chart</span>
+          Reporte Inventario
+        </button>
+        <button (click)="descargarReportePedidos()" 
+                class="bg-white border border-[#c4c6d1]/20 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#00173d] hover:bg-[#f2f4f7] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">shopping_cart</span>
+          Reporte Pedidos
+        </button>
+      </ng-container>
+      
+      <button *ngIf="isEmpleado" (click)="descargarMisVentas()" 
+              class="bg-[#0b2b5e] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#00173d] transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">receipt</span>
+        Mis Ventas
+      </button>
+    </div>
   </div>
 
-  <!-- 📊 CARGANDO -->
-  <div *ngIf="loading" class="loading">Cargando datos...</div>
+  <!-- 🔥 FILTRO DE FECHAS (solo ADMIN) -->
+  <div *ngIf="isAdmin" class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+      <div>
+        <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest mb-1">Fecha inicio</label>
+        <input type="date" [(ngModel)]="fechaInicio" class="w-full px-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm">
+      </div>
+      <div>
+        <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest mb-1">Fecha fin</label>
+        <input type="date" [(ngModel)]="fechaFin" class="w-full px-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm">
+      </div>
+      <div>
+        <button (click)="descargarReportePorFecha()" 
+                class="bg-[#006970] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#005a61] transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+          Reporte por fecha
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton Loader -->
+  <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+    <div *ngFor="let i of [1,2,3,4,5]" class="bg-white rounded-xl p-6 shadow-sm animate-pulse">
+      <div class="h-4 bg-slate-200 rounded w-24 mb-2"></div>
+      <div class="h-8 bg-slate-200 rounded w-16"></div>
+    </div>
+  </div>
 
   <!-- 📊 MÉTRICAS (ambos roles ven) -->
-  <div *ngIf="!loading" class="metrics-grid">
-    <div class="metric-card">
-      <h3>Total Ventas</h3>
-      <p>{{ metrics.totalVentas | number }}</p>
+  <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-[#c4c6d1]/10">
+      <p class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider mb-2">Total Ventas</p>
+      <p class="text-2xl font-bold text-[#00173d]">{{ metrics.totalVentas | number }}</p>
     </div>
-    <div class="metric-card">
-      <h3>Total Clientes</h3>
-      <p>{{ metrics.totalClientes | number }}</p>
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-[#c4c6d1]/10">
+      <p class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider mb-2">Total Clientes</p>
+      <p class="text-2xl font-bold text-[#00173d]">{{ metrics.totalClientes | number }}</p>
     </div>
-    <div class="metric-card">
-      <h3>Total Bicicletas</h3>
-      <p>{{ metrics.totalBicicletas | number }}</p>
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-[#c4c6d1]/10">
+      <p class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider mb-2">Total Bicicletas</p>
+      <p class="text-2xl font-bold text-[#00173d]">{{ metrics.totalBicicletas | number }}</p>
     </div>
-    <div class="metric-card">
-      <h3>Stock Bajo</h3>
-      <p>{{ metrics.stockBajo | number }}</p>
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-[#c4c6d1]/10">
+      <p class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider mb-2">Stock Bajo</p>
+      <p class="text-2xl font-bold text-[#f57c00]">{{ metrics.stockBajo | number }}</p>
     </div>
-    <div class="metric-card">
-      <h3>Sin Stock</h3>
-      <p>{{ metrics.sinStock | number }}</p>
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-[#c4c6d1]/10">
+      <p class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider mb-2">Sin Stock</p>
+      <p class="text-2xl font-bold text-[#ba1a1a]">{{ metrics.sinStock | number }}</p>
     </div>
   </div>
 
   <!-- 🏆 TOP BICICLETAS (solo ADMIN) -->
-  <div *ngIf="isAdmin && !loading && topBicicletas.length > 0" class="top-bikes">
-    <h2>Top bicicletas más vendidas</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Marca</th>
-          <th>Modelo</th>
-          <th>Unidades vendidas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let bike of topBicicletas">
-          <td>{{ bike.codigo }}</td>
-          <td>{{ bike.marca }}</td>
-          <td>{{ bike.modelo }}</td>
-          <td>{{ bike.totalVendido }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div *ngIf="isAdmin && !loading && topBicicletas.length > 0" class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 overflow-hidden">
+    <div class="px-6 py-4 border-b border-[#c4c6d1]/10">
+      <h3 class="text-lg font-bold text-[#00173d]">Top bicicletas más vendidas</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-[#f2f4f7]">
+          <tr>
+            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Código</th>
+            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Marca</th>
+            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Modelo</th>
+            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Unidades vendidas</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#c4c6d1]/10">
+          <tr *ngFor="let bike of topBicicletas" class="hover:bg-[#f2f4f7] transition-colors">
+            <td class="px-6 py-4 text-sm text-[#44474f]">{{ bike.codigo }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-[#00173d]">{{ bike.marca }}</td>
+            <td class="px-6 py-4 text-sm text-[#44474f]">{{ bike.modelo }}</td>
+            <td class="px-6 py-4 text-sm font-bold text-[#006970]">{{ bike.totalVendido }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

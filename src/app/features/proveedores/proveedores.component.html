@@ -1,100 +1,180 @@
-﻿<div class="proveedores-container">
-  <div class="header">
-    <h1>Gestión de Proveedores</h1>
-    <button class="btn-primary" (click)="abrirFormulario()">+ Nuevo Proveedor</button>
+﻿<div class="p-6 bg-[#f8f9fa] min-h-screen">
+  <!-- Header -->
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <span class="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-[#006970] mb-1 block">
+        Digital Atelier
+      </span>
+      <h2 class="text-3xl font-bold text-[#00173d] tracking-tight">Gestión de Proveedores</h2>
+      <p class="text-sm text-[#44474f] mt-1">
+        Administra los proveedores del taller
+      </p>
+    </div>
+    <button (click)="abrirFormulario()" 
+            class="bg-[#0b2b5e] text-white px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-[#00173d] transition-all shadow-lg active:scale-95">
+      <span class="material-symbols-outlined text-sm">add</span>
+      Nuevo Proveedor
+    </button>
   </div>
 
-  <!-- Modal de formulario -->
-  <div class="modal" *ngIf="mostrarFormulario">
-    <div class="modal-content">
-        <button class="close-btn" (click)="cancelarFormulario()">×</button>
-      <h2>{{ proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h2>
-      
-      <div class="form-group">
-        <label>Nombre *</label>
-        <input 
-          type="text" 
-          [(ngModel)]="nuevoProveedor.nombre" 
-          class="form-control" 
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Teléfono</label>
-        <input 
-          type="tel" 
-          [(ngModel)]="nuevoProveedor.telefono" 
-          class="form-control"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Email</label>
-        <input 
-          type="email" 
-          [(ngModel)]="nuevoProveedor.email" 
-          class="form-control"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Frecuencia de Entrega</label>
-        <select [(ngModel)]="nuevoProveedor.frecuenciaEntrega" class="form-control">
-          <option value="SEMANAL">Semanal</option>
-          <option value="QUINCENAL">Quincenal</option>
-          <option value="MENSUAL">Mensual</option>
-        </select>
-      </div>
-
-      <div class="modal-buttons">
-        <button class="btn-success" (click)="guardarProveedor()">Guardar</button>
-        <button class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
-      </div>
+  <!-- 🔍 FILTRO DE BÚSQUEDA -->
+  <div class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 p-4 mb-6">
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+      <input type="text" [(ngModel)]="filtroBusqueda" (ngModelChange)="aplicarFiltro()" 
+             placeholder="Buscar por nombre..." 
+             class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all">
     </div>
   </div>
 
   <!-- Tabla de proveedores -->
-  <div class="table-container">
-    <div *ngIf="loading" class="loading">Cargando proveedores...</div>
-    
-    <table class="table" *ngIf="!loading">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Teléfono</th>
-          <th>Email</th>
-          <th>Frecuencia</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let prov of proveedores; trackBy: trackById">
-          <td>{{ prov.id }}</td>
-          <td>{{ prov.nombre }}</td>
-          <td>{{ prov.telefono || '-' }}</td>
-          <td>{{ prov.email || '-' }}</td>
-          <td>
-            <span class="badge" [class.badge-semanal]="prov.frecuenciaEntrega === 'SEMANAL'"
-                                  [class.badge-quincenal]="prov.frecuenciaEntrega === 'QUINCENAL'"
-                                  [class.badge-mensual]="prov.frecuenciaEntrega === 'MENSUAL'">
-              {{ prov.frecuenciaEntrega }}
-            </span>
-          </td>
-          <td class="actions">
-            <button class="btn-icon btn-edit" (click)="editarProveedor(prov)" title="Editar">
-              ✏️
-            </button>
-            <button class="btn-icon btn-delete" (click)="eliminarProveedor(prov.id)" title="Eliminar">
-              🗑️
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="proveedores.length === 0">
-          <td colspan="6" class="text-center">No hay proveedores registrados</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-[#f2f4f7]">
+          <tr>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">ID</th>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre</th>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</th>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Email</th>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Frecuencia</th>
+            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#c4c6d1]/10">
+          <tr *ngIf="loading">
+            <td colspan="6" class="px-6 py-12 text-center text-slate-400">Cargando proveedores...</td>
+          </tr>
+          <tr *ngFor="let prov of proveedoresFiltrados" class="hover:bg-[#f2f4f7] transition-colors">
+            <td class="px-6 py-4 text-sm text-[#44474f]">{{ prov.id }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-[#00173d]">{{ prov.nombre }}</td>
+            <td class="px-6 py-4 text-sm text-[#44474f]">{{ prov.telefono || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-[#44474f]">{{ prov.email || '-' }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase"
+                    [ngClass]="{
+                      'bg-[#dbeafe] text-[#1e40af]': prov.frecuenciaEntrega === 'SEMANAL',
+                      'bg-[#fef3c7] text-[#92400e]': prov.frecuenciaEntrega === 'QUINCENAL',
+                      'bg-[#dcfce7] text-[#166534]': prov.frecuenciaEntrega === 'MENSUAL'
+                    }">
+                {{ prov.frecuenciaEntrega }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <button (click)="editarProveedor(prov)" class="p-2 hover:bg-white rounded-lg transition-all text-slate-400 hover:text-[#006970]">
+                <span class="material-symbols-outlined text-lg">edit</span>
+              </button>
+              <button (click)="confirmarEliminar(prov)" class="p-2 hover:bg-white rounded-lg transition-all text-slate-400 hover:text-[#ba1a1a]">
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && proveedores.length === 0">
+            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
+              <span class="material-symbols-outlined text-4xl block mb-2">inbox</span>
+              No hay proveedores registrados
+            <tr>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<!-- 🔥 MODAL PROFESIONAL (mismo estilo que Pedidos) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4" *ngIf="mostrarFormulario">
+  <div class="absolute inset-0 bg-[#0b2b5e]/40 backdrop-blur-md" (click)="cancelarFormulario()"></div>
+  <div class="relative w-full max-w-xl bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] overflow-hidden border border-white/20">
+    <!-- Modal Header -->
+    <div class="px-8 py-6 bg-[#0b2b5e] text-white flex justify-between items-center">
+      <div>
+        <h3 class="text-xl font-bold tracking-tight">{{ proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h3>
+        <p class="text-white/60 text-xs font-medium uppercase tracking-widest mt-1">Configuración de Acceso</p>
+      </div>
+      <button (click)="cancelarFormulario()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="p-8">
+      <div class="space-y-6">
+        <!-- Nombre -->
+        <div class="space-y-2">
+          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre completo *</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">badge</span>
+            <input type="text" [(ngModel)]="nuevoProveedor.nombre" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="Ej. GW Bikes" />
+          </div>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="space-y-2">
+          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">call</span>
+            <input type="tel" [(ngModel)]="nuevoProveedor.telefono" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="3001234567" />
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="space-y-2">
+          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Correo Electrónico</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
+            <input type="email" [(ngModel)]="nuevoProveedor.email" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="ventas@gwbikes.com" />
+          </div>
+        </div>
+
+        <!-- Frecuencia de Entrega -->
+        <div class="space-y-2">
+          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Frecuencia de Entrega</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">schedule</span>
+            <select [(ngModel)]="nuevoProveedor.frecuenciaEntrega" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all appearance-none">
+              <option value="SEMANAL">Semanal</option>
+              <option value="QUINCENAL">Quincenal</option>
+              <option value="MENSUAL">Mensual</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+          </div>
+        </div>
+
+        <!-- Nota informativa -->
+        <div class="p-4 bg-[#006970]/5 rounded-xl border border-[#006970]/10 flex gap-3">
+          <span class="material-symbols-outlined text-[#006970] text-lg">info</span>
+          <p class="text-xs text-[#44474f] leading-relaxed">
+            Los campos marcados con <strong class="text-[#ba1a1a]">*</strong> son obligatorios.
+          </p>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="flex justify-end gap-3 pt-2">
+          <button (click)="cancelarFormulario()" class="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-[#00173d] transition-colors rounded-xl hover:bg-[#f2f4f7]">
+            Cancelar
+          </button>
+          <button (click)="guardarProveedor()" class="px-8 py-2.5 bg-[#006970] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#006970]/20 hover:bg-[#005a61] active:scale-95 transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">save</span>
+            {{ proveedorEditando ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<app-modal
+  [isOpen]="showDeleteModal"
+  title="Eliminar Proveedor"
+  subtitle="Esta acción no se puede deshacer"
+  variant="danger"
+  confirmLabel="Sí, eliminar"
+  cancelLabel="Cancelar"
+  (confirmed)="eliminarProveedorConfirmado()"
+  (cancelled)="cerrarModal()">
+  <p class="text-sm text-[#44474f]">
+    ¿Estás seguro de que deseas eliminar a <strong class="text-[#00173d]">{{ proveedorAEliminar?.nombre }}</strong>?
+    Esta acción no se puede deshacer.
+  </p>
+</app-modal>

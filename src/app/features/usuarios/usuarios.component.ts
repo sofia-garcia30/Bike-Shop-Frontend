@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { Usuario } from '../../core/models/usuario.model';
+import { ToastService } from '../../shared/components/toast/toast.service';
+import { ModalComponent } from '../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalComponent],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.scss']
 })
@@ -16,6 +18,17 @@ export class UsuariosComponent implements OnInit {
   usuarioEditando: Usuario | null = null;
   mostrarFormulario = false;
   loading = true;
+  filtroBusqueda: string = '';
+usuariosFiltrados: Usuario[] = [];
+
+  // Variables para el modal de confirmación
+  showConfirmModal = false;
+  modalTitulo = '';
+  modalSubtitulo = '';
+  modalVariant: 'default' | 'confirm' | 'danger' = 'confirm';
+  modalConfirmLabel = '';
+  modalMensaje = '';
+  usuarioParaToggle: Usuario | null = null;
 
   nuevoUsuario = {
     nombre: '',
@@ -26,28 +39,31 @@ export class UsuariosComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
     this.cargarUsuarios();
   }
 
-  cargarUsuarios(): void {
-    this.loading = true;
-    this.usuarioService.getAll().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error cargando usuarios', err);
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+cargarUsuarios(): void {
+  this.loading = true;
+  this.usuarioService.getAll().subscribe({
+    next: (data) => {
+      this.usuarios = data;
+      this.usuariosFiltrados = data;  // ← Agrega esta línea
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('Error cargando usuarios', err);
+      this.toast.error('Error al cargar los usuarios');
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   abrirFormulario(): void {
     this.mostrarFormulario = true;
@@ -75,20 +91,19 @@ export class UsuariosComponent implements OnInit {
 
   guardarUsuario(): void {
     if (!this.nuevoUsuario.nombre?.trim()) {
-      alert('El nombre es obligatorio');
+      this.toast.warning('El nombre es obligatorio');
       return;
     }
     if (!this.nuevoUsuario.email?.trim()) {
-      alert('El email es obligatorio');
+      this.toast.warning('El email es obligatorio');
       return;
     }
     if (!this.usuarioEditando && !this.nuevoUsuario.password?.trim()) {
-      alert('La contraseña es obligatoria para nuevos usuarios');
+      this.toast.warning('La contraseña es obligatoria para nuevos usuarios');
       return;
     }
 
     if (this.usuarioEditando) {
-      // Actualizar usuario
       const datosActualizar = {
         nombre: this.nuevoUsuario.nombre,
         email: this.nuevoUsuario.email,
@@ -102,70 +117,99 @@ export class UsuariosComponent implements OnInit {
             this.usuarios[index] = { ...this.usuarios[index], ...respuesta };
             this.usuarios = [...this.usuarios];
           }
-          this.cdr.detectChanges();
           this.mostrarFormulario = false;
           this.usuarioEditando = null;
           this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            this.mostrarFormulario = false;
-            this.cdr.detectChanges();
-          }, 0);
-        },
-        error: (err) => console.error('Error actualizando usuario', err)
-      });
-    } else {
-      // Crear nuevo usuario
-      this.usuarioService.crear(this.nuevoUsuario).subscribe({
-        next: (respuesta) => {
-          this.usuarios = [...this.usuarios, respuesta];
-          this.cdr.detectChanges();
-          this.mostrarFormulario = false;
-          this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            this.mostrarFormulario = false;
-            this.cdr.detectChanges();
-          }, 0);
-        },
-        error: (err) => console.error('Error creando usuario', err)
-      });
-    }
-  }
-
-// Reemplaza el método eliminarUsuario por:
-toggleUsuario(usuario: Usuario): void {
-  const accion = usuario.activo ? 'desactivar' : 'activar';
-  const mensaje = `¿${accion} este usuario?`;
-  
-  if (confirm(mensaje)) {
-    if (usuario.activo) {
-      this.usuarioService.desactivar(usuario.id).subscribe({
-        next: () => {
-          usuario.activo = false;
-          this.usuarios = [...this.usuarios];
+          this.toast.success('Usuario actualizado correctamente');
           this.cdr.detectChanges();
         },
         error: (err) => {
-        // 🔥 Mostrar mensaje de error del backend
-        const mensaje = err.error?.mensaje || err.message || 'Error al desactivar usuario';
-        alert(mensaje);
-        console.error('Error desactivando usuario', err);
-      }
-
+          console.error('Error actualizando usuario', err);
+          this.toast.error('Error al actualizar el usuario');
+        }
       });
     } else {
-      this.usuarioService.activar(usuario.id).subscribe({
-        next: () => {
-          usuario.activo = true;
-          this.usuarios = [...this.usuarios];
+      this.usuarioService.crear(this.nuevoUsuario).subscribe({
+        next: (respuesta) => {
+          this.usuarios = [...this.usuarios, respuesta];
+          this.mostrarFormulario = false;
+          this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
+          this.toast.success('Usuario creado correctamente');
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Error activando usuario', err)
+        error: (err) => {
+          console.error('Error creando usuario', err);
+          this.toast.error('Error al crear el usuario');
+        }
       });
     }
   }
-}
+
+  // Abrir modal de confirmación para toggle (activar/desactivar)
+  abrirModalToggle(usuario: Usuario): void {
+    this.usuarioParaToggle = usuario;
+    const accion = usuario.activo ? 'desactivar' : 'activar';
+    this.modalTitulo = `${accion === 'activar' ? 'Activar' : 'Desactivar'} Usuario`;
+    this.modalSubtitulo = `Esta acción ${accion === 'activar' ? 'habilitará' : 'deshabilitará'} el acceso del usuario`;
+    this.modalVariant = usuario.activo ? 'danger' : 'confirm';
+    this.modalConfirmLabel = `Sí, ${accion}`;
+    this.modalMensaje = `¿Estás seguro de que deseas <strong>${accion}</strong> al usuario <strong>${usuario.nombre}</strong>?`;
+    this.showConfirmModal = true;
+    this.cdr.detectChanges();
+  }
+
+  // Confirmar toggle después del modal
+  confirmarToggle(): void {
+    if (this.usuarioParaToggle) {
+      if (this.usuarioParaToggle.activo) {
+        this.usuarioService.desactivar(this.usuarioParaToggle.id).subscribe({
+          next: () => {
+            this.usuarioParaToggle!.activo = false;
+            this.usuarios = [...this.usuarios];
+            this.toast.success('Usuario desactivado correctamente');
+            this.showConfirmModal = false;
+            this.usuarioParaToggle = null;
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            const mensaje = err.error?.mensaje || err.message || 'Error al desactivar usuario';
+            this.toast.error(mensaje);
+            this.showConfirmModal = false;
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        this.usuarioService.activar(this.usuarioParaToggle.id).subscribe({
+          next: () => {
+            this.usuarioParaToggle!.activo = true;
+            this.usuarios = [...this.usuarios];
+            this.toast.success('Usuario activado correctamente');
+            this.showConfirmModal = false;
+            this.usuarioParaToggle = null;
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error('Error activando usuario', err);
+            this.toast.error('Error al activar el usuario');
+            this.showConfirmModal = false;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+
+  // Cerrar modal
+  cerrarModal(): void {
+    this.showConfirmModal = false;
+    this.usuarioParaToggle = null;
+    this.cdr.detectChanges();
+  }
+
+  // Método toggle que abre el modal (reemplaza el confirm)
+  toggleUsuario(usuario: Usuario): void {
+    this.abrirModalToggle(usuario);
+  }
 
   cancelarFormulario(): void {
     this.mostrarFormulario = false;
@@ -177,4 +221,17 @@ toggleUsuario(usuario: Usuario): void {
   getRolBadgeClass(rol: string): string {
     return rol === 'ADMIN' ? 'badge-admin' : 'badge-empleado';
   }
+
+  aplicarFiltro(): void {
+  if (!this.filtroBusqueda) {
+    this.usuariosFiltrados = [...this.usuarios];
+  } else {
+    const busqueda = this.filtroBusqueda.toLowerCase();
+    this.usuariosFiltrados = this.usuarios.filter(user => 
+      user.nombre.toLowerCase().includes(busqueda) ||
+      user.email.toLowerCase().includes(busqueda)
+    );
+  }
+}
+
 }
