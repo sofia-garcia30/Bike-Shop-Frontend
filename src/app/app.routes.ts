@@ -15,7 +15,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layout/main-layout/main-layout.component')
         .then(m => m.MainLayoutComponent),
+
     children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -67,11 +73,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/reportes/reportes.component')
             .then(m => m.ReportesComponent)
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
       }
     ]
   },

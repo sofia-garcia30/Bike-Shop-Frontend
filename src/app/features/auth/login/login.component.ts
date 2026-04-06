@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   email = '';
   password = '';
@@ -21,7 +23,7 @@ export class LoginComponent {
 
   login() {
     if (!this.email || !this.password) {
-      this.error = 'Por favor completa todos los campos';
+      this.toast.warning('Por favor completa todos los campos');
       return;
     }
 
@@ -31,10 +33,11 @@ export class LoginComponent {
     this.authService.login({ email: this.email, password: this.password })
       .subscribe({
         next: () => {
+          this.toast.success('Bienvenido al sistema');
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          this.error = err.error?.mensaje || 'Credenciales incorrectas';
+          this.toast.error(err.error?.mensaje || 'Credenciales incorrectas');
           this.cargando = false;
         }
       });

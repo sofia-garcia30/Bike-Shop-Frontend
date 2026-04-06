@@ -9,4 +9,5 @@ export interface Bicicleta {
   stockMinimo: number;
   stockMaximo: number;
   descripcion: string;
+  imagenUrl?: string;
 }
