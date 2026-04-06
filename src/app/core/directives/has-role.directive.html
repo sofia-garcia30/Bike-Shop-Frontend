@@ -1,0 +1,9 @@
+<!-- Solo ADMIN -->
+<button *hasRole="'ADMIN'" (click)="abrirFormNuevo()">
+  + Nueva Bicicleta
+</button>
+
+<!-- ADMIN o EMPLEADO -->
+<button *hasRole="['ADMIN', 'EMPLEADO']" (click)="verDetalle()">
+  Ver detalle
+</button>

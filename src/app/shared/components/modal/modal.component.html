@@ -1,0 +1,84 @@
+@if (show) {
+<div
+  id="modal-backdrop"
+  class="fixed inset-0 z-50 flex items-center justify-center px-4 transition-all duration-250"
+  [ngClass]="animating
+        ? 'bg-[#00173d]/40 backdrop-blur-sm'
+        : 'bg-transparent backdrop-blur-none'"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="'modal-title'"
+>
+  <!-- Panel -->
+  <div
+    class="relative w-full bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.18)]
+             border border-white/20 flex flex-col transition-all duration-250
+             max-h-[90vh]"
+    [ngClass]="[
+          sizeClass,
+          animating
+            ? 'opacity-100 scale-100 translate-y-0'
+            : 'opacity-0 scale-95 translate-y-4'
+        ]"
+  >
+    <!-- Línea de acento superior -->
+    <div class="absolute top-0 left-0 w-full h-[3px] bg-[#006970] opacity-60 rounded-t-xl"></div>
+
+    <!-- Header (fijo arriba) -->
+    <div class="px-8 py-6 bg-[#0b2b5e] text-white flex justify-between items-start flex-shrink-0 rounded-t-xl">
+      <div class="flex items-center gap-3">
+          <span
+            class="material-symbols-outlined text-2xl"
+            [ngClass]="headerIconColor"
+          >
+            {{ headerIcon }}
+          </span>
+        <div>
+          <h3 id="modal-title" class="text-lg font-bold tracking-tight">
+            {{ title }}
+          </h3>
+          @if (subtitle) {
+          <p class="text-white/60 text-xs font-medium uppercase tracking-widest mt-0.5">
+            {{ subtitle }}
+          </p>
+          }
+        </div>
+      </div>
+      <button
+        (click)="cancel()"
+        class="p-1.5 hover:bg-white/10 rounded-full transition-colors"
+        aria-label="Cerrar"
+      >
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <!-- Body (scrolleable) -->
+    <div class="px-8 py-6 text-[#191c1e] text-sm leading-relaxed overflow-y-auto flex-1">
+      <ng-content />
+    </div>
+
+    <!-- Footer (fijo abajo, opcional) -->
+    @if (!hideFooter) {
+    <div class="px-8 py-5 bg-[#f2f4f7] border-t border-[#c4c6d1]/20 flex justify-end gap-3 flex-shrink-0 rounded-b-xl">
+      <button
+        (click)="cancel()"
+        class="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-[#00173d]
+                   transition-colors rounded-xl hover:bg-white"
+      >
+        {{ cancelLabel }}
+      </button>
+      <button
+        (click)="confirm()"
+        class="px-8 py-2.5 text-white text-sm font-bold rounded-xl shadow-lg
+                   active:scale-95 transition-all"
+        [ngClass]="confirmBtnClass"
+      >
+        {{ confirmLabel }}
+      </button>
+    </div>
+    }
+  </div>
+</div>
+}
