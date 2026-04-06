@@ -92,29 +92,88 @@
   </div>
 
   <!-- 🏆 TOP BICICLETAS (solo ADMIN) -->
-  <div *ngIf="isAdmin && !loading && topBicicletas.length > 0" class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 overflow-hidden">
-    <div class="px-6 py-4 border-b border-[#c4c6d1]/10">
-      <h3 class="text-lg font-bold text-[#00173d]">Top bicicletas más vendidas</h3>
+<!-- 🏆 TOP BICICLETAS MÁS VENDIDAS (solo ADMIN) -->
+<div *ngIf="isAdmin && !loading && topBicicletas.length > 0" class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 overflow-hidden">
+  <div class="px-6 py-4 border-b border-[#c4c6d1]/10 flex justify-between items-center">
+    <div>
+      <h3 class="text-lg font-bold text-[#00173d]">🏆 Top bicicletas más vendidas</h3>
+      <p class="text-xs text-slate-400 mt-0.5">Las más populares entre nuestros clientes</p>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
-        <thead class="bg-[#f2f4f7]">
-          <tr>
-            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Código</th>
-            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Marca</th>
-            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Modelo</th>
-            <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Unidades vendidas</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[#c4c6d1]/10">
-          <tr *ngFor="let bike of topBicicletas" class="hover:bg-[#f2f4f7] transition-colors">
-            <td class="px-6 py-4 text-sm text-[#44474f]">{{ bike.codigo }}</td>
-            <td class="px-6 py-4 text-sm font-medium text-[#00173d]">{{ bike.marca }}</td>
-            <td class="px-6 py-4 text-sm text-[#44474f]">{{ bike.modelo }}</td>
-            <td class="px-6 py-4 text-sm font-bold text-[#006970]">{{ bike.totalVendido }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <span class="text-[0.6rem] font-bold text-[#006970] bg-[#e6f4f1] px-3 py-1 rounded-full">Ranking</span>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-[#f2f4f7]">
+        <tr>
+          <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Posición</th>
+          <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Bicicleta</th>
+          <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Tipo</th>
+          <th class="px-6 py-3 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest text-right">Unidades vendidas</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#c4c6d1]/10">
+        <tr *ngFor="let bike of topBicicletas; let i = index" class="hover:bg-[#f2f4f7] transition-colors group">
+          <!-- Posición con medalla -->
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-bold" [ngClass]="{
+                'text-yellow-500': i === 0,
+                'text-gray-400': i === 1,
+                'text-amber-600': i === 2,
+                'text-slate-400': i > 2
+              }">
+                {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1) }}
+              </span>
+            </div>
+           </td>
+          
+          <!-- Bicicleta con imagen -->
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <!-- Imagen de la bicicleta -->
+              <div class="w-12 h-12 rounded-lg overflow-hidden bg-[#f2f4f7] flex items-center justify-center flex-shrink-0">
+                <img *ngIf="bike.imagenUrl" [src]="bike.imagenUrl" [alt]="bike.marca + ' ' + bike.modelo" 
+                     class="w-full h-full object-cover" 
+                     (error)="bike.imagenUrl = null">
+                <span *ngIf="!bike.imagenUrl" class="material-symbols-outlined text-2xl text-slate-300">pedal_bike</span>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-[#00173d]">{{ bike.marca }} {{ bike.modelo }}</p>
+                <p class="text-[10px] text-slate-400 font-mono">Código: #{{ bike.codigo }}</p>
+              </div>
+            </div>
+           </td>
+          
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-[#dbeafe] text-[#1e40af]">
+              {{ bike.tipo || 'Bicicleta' }}
+            </span>
+           </td>
+          
+          <td class="px-6 py-4 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <span class="text-xl font-bold text-[#006970]">{{ bike.totalVendido }}</span>
+              <span class="text-xs text-slate-400">unidades</span>
+            </div>
+            <!-- Barra de progreso (opcional) -->
+            <div class="w-32 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+              <div class="h-full bg-[#006970] rounded-full" 
+                   [style.width.%]="(bike.totalVendido / topBicicletas[0]?.totalVendido) * 100"></div>
+            </div>
+           </td>
+         </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Footer con estadística -->
+  <div class="px-6 py-3 bg-[#f2f4f7]/30 border-t border-[#c4c6d1]/10 text-right">
+    <p class="text-[10px] text-slate-400">
+      Total de unidades vendidas: 
+      <strong class="text-[#00173d]">{{ topBicicletas.reduce((sum, bike) => sum + (bike.totalVendido || 0), 0) }}</strong>
+    </p>
+  </div>
+
   </div>
 </div>
