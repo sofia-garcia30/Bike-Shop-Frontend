@@ -1,1 +1,109 @@
-﻿<p>PedidosComponent funcionando</p>
+﻿<div class="pedidos-container">
+  <div class="header">
+    <h1>Gestión de Pedidos</h1>
+
+    <!-- 🔥 BOTONES PARA ADMIN (PDF, Excel, Nuevo Pedido) -->
+    <div class="header-buttons">
+      <ng-container *ngIf="isAdmin">
+        <button (click)="descargarReportePDF()" class="btn-secondary">📄 PDF</button>
+        <button (click)="descargarReporteExcel()" class="btn-secondary">📊 Excel</button>
+        <button class="btn-primary" (click)="toggleFormulario()">
+          {{ showForm ? 'Cancelar' : '+ Nuevo Pedido' }}
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- 🔥 FORMULARIO DE NUEVO PEDIDO (solo ADMIN) -->
+  <div class="form-card" *ngIf="showForm && isAdmin">
+    <h2>Nuevo Pedido al Taller</h2>
+    <div class="form-group">
+      <label>Proveedor:</label>
+      <select [(ngModel)]="nuevoPedido.idProveedor" class="form-control">
+        <option [value]="0">Seleccionar Proveedor</option>
+        <option *ngFor="let prov of proveedores" [value]="prov.id">{{ prov.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="detalle-form">
+      <h3>Agregar bicicleta</h3>
+      <div class="row">
+        <div class="col">
+          <label>Bicicleta:</label>
+          <select [(ngModel)]="detalleActual.codigoBicicleta" class="form-control">
+            <option [value]="0">Seleccionar</option>
+            <option *ngFor="let bici of bicicletas" [value]="bici.codigo">
+              {{ bici.marca }} {{ bici.modelo }}
+            </option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Cantidad:</label>
+          <input type="number" [(ngModel)]="detalleActual.cantidad" class="form-control" min="1">
+        </div>
+        <div class="col">
+          <label>Precio costo unit.:</label>
+          <input type="number" [(ngModel)]="detalleActual.precioCostoUnitario" class="form-control" min="0" step="100">
+        </div>
+        <div class="col-btn">
+          <button class="btn-secondary" (click)="agregarDetalle()">+ Añadir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de detalles agregados -->
+    <table class="detalle-table" *ngIf="nuevoPedido.detalles.length > 0">
+      <thead>
+        <tr><th>Bicicleta</th><th>Cantidad</th><th>Precio costo</th><th>Acción</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let det of nuevoPedido.detalles; let i = index">
+          <td>{{ det.nombreBicicleta || 'Desconocida' }}</td>
+          <td>{{ det.cantidad }}</td>
+          <td>{{ det.precioCostoUnitario | currency:'COP':'symbol-narrow' }}</td>
+          <td><button (click)="eliminarDetalle(i)">❌</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="form-actions">
+      <button class="btn-success" (click)="crearPedido()">Confirmar Pedido</button>
+    </div>
+  </div>
+
+  <!-- 🔥 LISTADO DE PEDIDOS (ambos roles ven) -->
+  <div class="pedidos-list">
+    <h2>Historial de Pedidos</h2>
+    <div *ngIf="loading">Cargando...</div>
+    <table class="pedidos-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Nº Pedido</th>
+          <th>Proveedor</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ped of pedidos">
+          <td>{{ ped.id }}</td>
+          <td>{{ getNombreProveedor(ped.idProveedor) }}</td>
+          <td>{{ ped.fecha | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge" [ngClass]="{'badge-success': ped.estado === 'recibido', 'badge-warning': ped.estado === 'pendiente'}">
+              {{ ped.estado }}
+            </span>
+          </td>
+          <td class="acciones">
+            <!-- 🔥 Botón Marcar Recibido (AMBOS roles pueden) -->
+            <button *ngIf="ped.estado === 'pendiente'" class="btn-small" (click)="marcarRecibido(ped.id)">
+              Marcar recibido
+            </button>
+            <span *ngIf="ped.estado === 'recibido'" class="text-success">✔ Recibido</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

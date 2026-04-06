@@ -1,1 +1,100 @@
-﻿<p>ProveedoresComponent funcionando</p>
+﻿<div class="proveedores-container">
+  <div class="header">
+    <h1>Gestión de Proveedores</h1>
+    <button class="btn-primary" (click)="abrirFormulario()">+ Nuevo Proveedor</button>
+  </div>
+
+  <!-- Modal de formulario -->
+  <div class="modal" *ngIf="mostrarFormulario">
+    <div class="modal-content">
+        <button class="close-btn" (click)="cancelarFormulario()">×</button>
+      <h2>{{ proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h2>
+      
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="nuevoProveedor.nombre" 
+          class="form-control" 
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input 
+          type="tel" 
+          [(ngModel)]="nuevoProveedor.telefono" 
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input 
+          type="email" 
+          [(ngModel)]="nuevoProveedor.email" 
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Frecuencia de Entrega</label>
+        <select [(ngModel)]="nuevoProveedor.frecuenciaEntrega" class="form-control">
+          <option value="SEMANAL">Semanal</option>
+          <option value="QUINCENAL">Quincenal</option>
+          <option value="MENSUAL">Mensual</option>
+        </select>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-success" (click)="guardarProveedor()">Guardar</button>
+        <button class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de proveedores -->
+  <div class="table-container">
+    <div *ngIf="loading" class="loading">Cargando proveedores...</div>
+    
+    <table class="table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Frecuencia</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prov of proveedores; trackBy: trackById">
+          <td>{{ prov.id }}</td>
+          <td>{{ prov.nombre }}</td>
+          <td>{{ prov.telefono || '-' }}</td>
+          <td>{{ prov.email || '-' }}</td>
+          <td>
+            <span class="badge" [class.badge-semanal]="prov.frecuenciaEntrega === 'SEMANAL'"
+                                  [class.badge-quincenal]="prov.frecuenciaEntrega === 'QUINCENAL'"
+                                  [class.badge-mensual]="prov.frecuenciaEntrega === 'MENSUAL'">
+              {{ prov.frecuenciaEntrega }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn-icon btn-edit" (click)="editarProveedor(prov)" title="Editar">
+              ✏️
+            </button>
+            <button class="btn-icon btn-delete" (click)="eliminarProveedor(prov.id)" title="Eliminar">
+              🗑️
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="proveedores.length === 0">
+          <td colspan="6" class="text-center">No hay proveedores registrados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

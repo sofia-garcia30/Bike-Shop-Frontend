@@ -65,6 +65,10 @@ export class AuthService {
     return this.getUsuario()?.rol === 'ADMIN';
   }
 
+  isEmpleado(): boolean {
+  return this.getUsuario()?.rol === 'EMPLEADO';
+}
+
   // ─── Verificar si está logueado ──────────────────────────────
   isLoggedIn(): boolean {
     return !!this.getToken();
