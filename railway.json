@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "buildArgs": {
+      "API_URL": "https://proactive-fulfillment-production-f1e7.up.railway.app"
+    }
+  }
+}
