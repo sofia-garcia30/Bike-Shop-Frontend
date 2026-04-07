@@ -69,6 +69,7 @@ export class VentasComponent implements OnInit {
     this.ventaService.listarTodas().subscribe(data => {
       this.ventas = data;
       this.ventasFiltradas = data;
+      this.cdr.detectChanges();
     });
   }
 
