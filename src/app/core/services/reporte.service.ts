@@ -57,4 +57,9 @@ export class ReporteService {
     link.click();
     window.URL.revokeObjectURL(url);
   }
+
+  ventasPorFechaPDF(inicio: string, fin: string): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/ventas/pdf/fecha?inicio=${inicio}&fin=${fin}`, 
+    { responseType: 'blob' });
+}
 }
