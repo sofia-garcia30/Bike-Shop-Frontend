@@ -1,0 +1,11 @@
+.pedidos-container {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .pedidos-container {
+    padding: 1rem;
+  }
+}

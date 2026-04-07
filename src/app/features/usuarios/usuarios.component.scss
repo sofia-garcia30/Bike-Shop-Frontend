@@ -1,0 +1,54 @@
+// Solo los estilos que Tailwind no cubre
+.usuarios-container {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+// Para el modal (el backdrop y animación)
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+// Botones de acción
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.125rem;
+  padding: 0.25rem;
+  transition: transform 0.1s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.btn-edit {
+  color: #3b82f6;
+}
+
+.btn-deactivate {
+  color: #ef4444;
+}
+
+.btn-activate {
+  color: #10b981;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .usuarios-container {
+    padding: 1rem;
+  }
+}

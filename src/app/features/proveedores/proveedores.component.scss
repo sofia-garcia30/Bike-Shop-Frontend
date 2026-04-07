@@ -1,0 +1,12 @@
+// Estilos mínimos (la mayoría ya está en Tailwind)
+.proveedores-container {
+  // Solo para asegurar que el fondo cubra toda la pantalla
+  min-height: 100vh;
+}
+
+// Si necesitas algún ajuste específico que Tailwind no cubre
+@media (max-width: 768px) {
+  .proveedores-container {
+    padding: 1rem;
+  }
+}

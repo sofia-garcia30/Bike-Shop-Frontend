@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    container_name: tienda_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: tienda_backend
+    container_name: tienda_backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tienda_bicicletas
+      SPRING_DATASOURCE_USERNAME: appuser
+      SPRING_DATASOURCE_PASSWORD: apppassword
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: tienda_mysql
+    environment:
+      MYSQL_DATABASE: tienda_bicicletas
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
