@@ -5,6 +5,7 @@ import {
   EventEmitter,
   OnInit,
   OnDestroy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Toast } from './toast.model';
@@ -23,9 +24,12 @@ export class ToastComponent implements OnInit, OnDestroy {
   visible = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     // Aparece inmediatamente sin delay
     this.visible = true;
+    this.cdr.detectChanges();
 
     const duration = this.toast.duration ?? 2000;
     this.timer = setTimeout(() => {
@@ -39,6 +43,7 @@ export class ToastComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.visible = false;
+    this.cdr.detectChanges();
     // Salida más rápida
     setTimeout(() => this.dismiss.emit(this.toast.id), 150);
   }

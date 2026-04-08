@@ -62,6 +62,7 @@ cargarUsuarios(): void {
     error: (err) => {
       console.error('Error cargando usuarios', err);
       this.toast.error('Error al cargar los usuarios');
+      this.cdr.detectChanges();
       this.loading = false;
       this.cdr.detectChanges();
     }
@@ -96,33 +97,40 @@ guardarUsuario(): void {
   // ✅ NUEVO: Validaciones en tiempo real antes de guardar
   if (this.emailInvalido) {
     this.toast.warning('Ingresa un email válido');
+    this.cdr.detectChanges();
     return;
   }
   if (this.passwordInvalido && !this.usuarioEditando) {
     this.toast.warning('La contraseña debe tener al menos 6 caracteres');
+    this.cdr.detectChanges();
     return;
   }
 
   if (!this.nuevoUsuario.nombre?.trim()) {
     this.toast.warning('El nombre es obligatorio');
+    this.cdr.detectChanges();
     return;
   }
   if (!this.nuevoUsuario.email?.trim()) {
     this.toast.warning('El email es obligatorio');
+    this.cdr.detectChanges();
     return;
   }
   // ✅ NUEVO: Validar formato de email
   if (!this.validarEmail(this.nuevoUsuario.email)) {
     this.toast.warning('Ingresa un email válido (ej: usuario@correo.com)');
+    this.cdr.detectChanges();
     return;
   }
   if (!this.usuarioEditando && !this.nuevoUsuario.password?.trim()) {
     this.toast.warning('La contraseña es obligatoria para nuevos usuarios');
+    this.cdr.detectChanges();
     return;
   }
   // ✅ NUEVO: Validar longitud mínima de contraseña
   if (!this.usuarioEditando && this.nuevoUsuario.password.trim().length < 6) {
     this.toast.warning('La contraseña debe tener al menos 6 caracteres');
+    this.cdr.detectChanges();
     return;
   }
 
@@ -145,10 +153,13 @@ guardarUsuario(): void {
         this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
         this.toast.success('Usuario actualizado correctamente');
         this.cdr.detectChanges();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error actualizando usuario', err);
         this.toast.error('Error al actualizar el usuario');
+        this.cdr.detectChanges();
+        this.cdr.detectChanges();
       }
     });
   } else {
@@ -159,10 +170,13 @@ guardarUsuario(): void {
         this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
         this.toast.success('Usuario creado correctamente');
         this.cdr.detectChanges();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error creando usuario', err);
         this.toast.error('Error al crear el usuario');
+        this.cdr.detectChanges();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -190,6 +204,7 @@ guardarUsuario(): void {
             this.usuarioParaToggle!.activo = false;
             this.usuarios = [...this.usuarios];
             this.toast.success('Usuario desactivado correctamente');
+            this.cdr.detectChanges();
             this.showConfirmModal = false;
             this.usuarioParaToggle = null;
             this.cdr.detectChanges();
@@ -197,6 +212,8 @@ guardarUsuario(): void {
           error: (err) => {
             const mensaje = err.error?.mensaje || err.message || 'Error al desactivar usuario';
             this.toast.error(mensaje);
+            this.cdr.detectChanges();
+            this.cdr.detectChanges();
             this.showConfirmModal = false;
             this.cdr.detectChanges();
           }
@@ -207,6 +224,7 @@ guardarUsuario(): void {
             this.usuarioParaToggle!.activo = true;
             this.usuarios = [...this.usuarios];
             this.toast.success('Usuario activado correctamente');
+            this.cdr.detectChanges();
             this.showConfirmModal = false;
             this.usuarioParaToggle = null;
             this.cdr.detectChanges();
@@ -214,6 +232,7 @@ guardarUsuario(): void {
           error: (err) => {
             console.error('Error activando usuario', err);
             this.toast.error('Error al activar el usuario');
+            this.cdr.detectChanges();
             this.showConfirmModal = false;
             this.cdr.detectChanges();
           }
