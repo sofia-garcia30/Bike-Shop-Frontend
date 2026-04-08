@@ -1,5 +1,5 @@
 <div
-  class="relative flex items-start gap-3 w-80 rounded-xl shadow-lg px-4 py-4 transition-all duration-150 overflow-hidden"
+  class="fixed top-4 right-4 z-[9999] flex items-start gap-3 w-80 rounded-xl shadow-lg px-4 py-4 transition-all duration-150 overflow-hidden"
   [ngClass]="[config.classes, visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8']"
   role="alert"
 >
@@ -28,7 +28,7 @@
     <div
       class="h-full progress-bar"
       [ngClass]="config.bar"
-      [style.animation-duration]="(toast.duration ?? 3000) + 'ms'"
+      [style.animation-duration]="(toast.duration ?? 2000) + 'ms'"
     ></div>
   </div>
 </div>
