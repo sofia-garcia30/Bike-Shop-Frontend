@@ -20,6 +20,7 @@ export class UsuariosComponent implements OnInit {
   loading = true;
   filtroBusqueda: string = '';
 usuariosFiltrados: Usuario[] = [];
+mostrarPassword = false;
 
   // Variables para el modal de confirmación
   showConfirmModal = false;
@@ -89,61 +90,71 @@ cargarUsuarios(): void {
     this.cdr.detectChanges();
   }
 
-  guardarUsuario(): void {
-    if (!this.nuevoUsuario.nombre?.trim()) {
-      this.toast.warning('El nombre es obligatorio');
-      return;
-    }
-    if (!this.nuevoUsuario.email?.trim()) {
-      this.toast.warning('El email es obligatorio');
-      return;
-    }
-    if (!this.usuarioEditando && !this.nuevoUsuario.password?.trim()) {
-      this.toast.warning('La contraseña es obligatoria para nuevos usuarios');
-      return;
-    }
-
-    if (this.usuarioEditando) {
-      const datosActualizar = {
-        nombre: this.nuevoUsuario.nombre,
-        email: this.nuevoUsuario.email,
-        rol: this.nuevoUsuario.rol,
-        ...(this.nuevoUsuario.password && { password: this.nuevoUsuario.password })
-      };
-      this.usuarioService.actualizar(this.usuarioEditando.id, datosActualizar).subscribe({
-        next: (respuesta) => {
-          const index = this.usuarios.findIndex(u => u.id === this.usuarioEditando!.id);
-          if (index !== -1) {
-            this.usuarios[index] = { ...this.usuarios[index], ...respuesta };
-            this.usuarios = [...this.usuarios];
-          }
-          this.mostrarFormulario = false;
-          this.usuarioEditando = null;
-          this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
-          this.toast.success('Usuario actualizado correctamente');
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error actualizando usuario', err);
-          this.toast.error('Error al actualizar el usuario');
-        }
-      });
-    } else {
-      this.usuarioService.crear(this.nuevoUsuario).subscribe({
-        next: (respuesta) => {
-          this.usuarios = [...this.usuarios, respuesta];
-          this.mostrarFormulario = false;
-          this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
-          this.toast.success('Usuario creado correctamente');
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error creando usuario', err);
-          this.toast.error('Error al crear el usuario');
-        }
-      });
-    }
+guardarUsuario(): void {
+  if (!this.nuevoUsuario.nombre?.trim()) {
+    this.toast.warning('El nombre es obligatorio');
+    return;
   }
+  if (!this.nuevoUsuario.email?.trim()) {
+    this.toast.warning('El email es obligatorio');
+    return;
+  }
+  // ✅ NUEVO: Validar formato de email
+  if (!this.validarEmail(this.nuevoUsuario.email)) {
+    this.toast.warning('Ingresa un email válido (ej: usuario@correo.com)');
+    return;
+  }
+  if (!this.usuarioEditando && !this.nuevoUsuario.password?.trim()) {
+    this.toast.warning('La contraseña es obligatoria para nuevos usuarios');
+    return;
+  }
+  // ✅ NUEVO: Validar longitud mínima de contraseña
+  if (!this.usuarioEditando && this.nuevoUsuario.password.trim().length < 6) {
+    this.toast.warning('La contraseña debe tener al menos 6 caracteres');
+    return;
+  }
+
+  if (this.usuarioEditando) {
+    const datosActualizar = {
+      nombre: this.nuevoUsuario.nombre,
+      email: this.nuevoUsuario.email,
+      rol: this.nuevoUsuario.rol,
+      ...(this.nuevoUsuario.password && { password: this.nuevoUsuario.password })
+    };
+    this.usuarioService.actualizar(this.usuarioEditando.id, datosActualizar).subscribe({
+      next: (respuesta) => {
+        const index = this.usuarios.findIndex(u => u.id === this.usuarioEditando!.id);
+        if (index !== -1) {
+          this.usuarios[index] = { ...this.usuarios[index], ...respuesta };
+          this.usuarios = [...this.usuarios];
+        }
+        this.mostrarFormulario = false;
+        this.usuarioEditando = null;
+        this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
+        this.toast.success('Usuario actualizado correctamente');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error actualizando usuario', err);
+        this.toast.error('Error al actualizar el usuario');
+      }
+    });
+  } else {
+    this.usuarioService.crear(this.nuevoUsuario).subscribe({
+      next: (respuesta) => {
+        this.cargarUsuarios();  // ← Ya lo tenías
+        this.mostrarFormulario = false;
+        this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
+        this.toast.success('Usuario creado correctamente');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error creando usuario', err);
+        this.toast.error('Error al crear el usuario');
+      }
+    });
+  }
+}
 
   // Abrir modal de confirmación para toggle (activar/desactivar)
   abrirModalToggle(usuario: Usuario): void {
@@ -232,6 +243,11 @@ cargarUsuarios(): void {
       user.email.toLowerCase().includes(busqueda)
     );
   }
+}
+
+validarEmail(email: string): boolean {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
 }
 
 }
