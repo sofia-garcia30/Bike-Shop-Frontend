@@ -21,6 +21,8 @@ export class UsuariosComponent implements OnInit {
   filtroBusqueda: string = '';
 usuariosFiltrados: Usuario[] = [];
 mostrarPassword = false;
+emailInvalido = false;
+passwordInvalido = false;
 
   // Variables para el modal de confirmación
   showConfirmModal = false;
@@ -91,6 +93,16 @@ cargarUsuarios(): void {
   }
 
 guardarUsuario(): void {
+  // ✅ NUEVO: Validaciones en tiempo real antes de guardar
+  if (this.emailInvalido) {
+    this.toast.warning('Ingresa un email válido');
+    return;
+  }
+  if (this.passwordInvalido && !this.usuarioEditando) {
+    this.toast.warning('La contraseña debe tener al menos 6 caracteres');
+    return;
+  }
+
   if (!this.nuevoUsuario.nombre?.trim()) {
     this.toast.warning('El nombre es obligatorio');
     return;
@@ -142,7 +154,7 @@ guardarUsuario(): void {
   } else {
     this.usuarioService.crear(this.nuevoUsuario).subscribe({
       next: (respuesta) => {
-        this.cargarUsuarios();  // ← Ya lo tenías
+        this.cargarUsuarios();
         this.mostrarFormulario = false;
         this.nuevoUsuario = { nombre: '', email: '', password: '', rol: 'EMPLEADO' };
         this.toast.success('Usuario creado correctamente');
@@ -248,6 +260,24 @@ guardarUsuario(): void {
 validarEmail(email: string): boolean {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return regex.test(email);
+}
+
+// Validar email en tiempo real
+validarEmailTiempoReal(): void {
+  if (this.nuevoUsuario.email) {
+    this.emailInvalido = !this.validarEmail(this.nuevoUsuario.email);
+  } else {
+    this.emailInvalido = false;
+  }
+}
+
+// Validar password en tiempo real
+validarPasswordTiempoReal(): void {
+  if (this.nuevoUsuario.password && !this.usuarioEditando) {
+    this.passwordInvalido = this.nuevoUsuario.password.trim().length < 6;
+  } else {
+    this.passwordInvalido = false;
+  }
 }
 
 }

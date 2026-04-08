@@ -84,7 +84,7 @@
 </div>
 
 <!-- MODAL DE FORMULARIO -->
-<div class="fixed inset-0 z-50 flex items-center justify-center px-4" *ngIf="mostrarFormulario">
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4 pt-20" *ngIf="mostrarFormulario">
   <div class="absolute inset-0 bg-[#0b2b5e]/40 backdrop-blur-md" (click)="cancelarFormulario()"></div>
   <div class="relative w-full max-w-xl bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] overflow-y-auto max-h-[90vh] border border-white/20">
     <div class="px-8 py-6 bg-[#0b2b5e] text-white flex justify-between items-center">
@@ -111,7 +111,16 @@
           <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Correo Electrónico *</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
-            <input type="email" [(ngModel)]="nuevoUsuario.email" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="ejemplo@correo.com" />
+            <input type="email" [(ngModel)]="nuevoUsuario.email" (input)="validarEmailTiempoReal()"
+                  class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+                  [class.border]="emailInvalido"
+                  [class.border-red-500]="emailInvalido"
+                  placeholder="ejemplo@correo.com" />
+          </div>
+          <!-- Mensaje de error en tiempo real -->
+          <div *ngIf="emailInvalido && nuevoUsuario.email" class="text-red-500 text-xs mt-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">error</span>
+            Ingresa un email válido (ej: usuario@correo.com)
           </div>
         </div>
 
@@ -123,12 +132,20 @@
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">lock</span>
             <input [type]="mostrarPassword ? 'text' : 'password'" 
                   [(ngModel)]="nuevoUsuario.password" 
-                  class="w-full pl-10 pr-12 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" 
+                  (input)="validarPasswordTiempoReal()"
+                  class="w-full pl-10 pr-12 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+                  [class.border]="passwordInvalido"
+                  [class.border-red-500]="passwordInvalido"
                   placeholder="••••••••" />
             <button type="button" (click)="mostrarPassword = !mostrarPassword" 
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#006970]">
               <span class="material-symbols-outlined text-lg">{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</span>
             </button>
+          </div>
+          <!-- Mensaje de error en tiempo real -->
+          <div *ngIf="passwordInvalido && nuevoUsuario.password && !usuarioEditando" class="text-red-500 text-xs mt-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">error</span>
+            La contraseña debe tener al menos 6 caracteres
           </div>
         </div>
 
