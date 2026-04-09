@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { ListaClientesComponent } from './features/clientes/pages/lista-clientes/lista-clientes.component';
 
 export const routes: Routes = [
   {
@@ -36,9 +37,10 @@ export const routes: Routes = [
       },
       {
         path: 'clientes',
+        canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/clientes/clientes.component')
-            .then(m => m.ClientesComponent)
+          loadComponent: () => import('./features/clientes/pages/lista-clientes/lista-clientes.component')
+            .then(m => m.ListaClientesComponent)
       },
       {
         path: 'ventas',
