@@ -1,60 +1,75 @@
-<div class="p-6">
-  <!-- Header y botón -->
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-[#0b2b5e]">Clientes</h2>
+<div class="p-6 bg-[#f8f9fa] min-h-screen">
+  <!-- Header -->
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <span class="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-[#006970] mb-1 block">
+        Bike Shop
+      </span>
+      <h2 class="text-3xl font-bold text-[#00173d] tracking-tight">Gestión de Clientes</h2>
+      <p class="text-sm text-[#44474f] mt-1">
+        Administra la información de los clientes
+      </p>
+    </div>
     <button (click)="abrirModalCrear()"
-            class="bg-[#006970] hover:bg-[#004d55] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+            class="bg-[#0b2b5e] text-white px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-[#00173d] transition-all shadow-lg active:scale-95">
       <span class="material-symbols-outlined text-sm">add</span>
       Nuevo Cliente
     </button>
   </div>
 
-  <!-- Filtro -->
-  <div class="mb-4">
-    <input type="text" [(ngModel)]="filtroDocumento" (input)="aplicarFiltro()"
-           placeholder="Buscar por documento o nombre..."
-           class="w-full md:w-1/3 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
+  <!-- FILTRO DE BÚSQUEDA -->
+  <div class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 p-4 mb-6">
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+      <input type="text" [(ngModel)]="filtroDocumento" (ngModelChange)="aplicarFiltro()"
+             placeholder="Buscar por documento o nombre..."
+             class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all">
+    </div>
   </div>
 
-  <!-- Cargando / Error -->
-  <div *ngIf="cargando" class="flex justify-center py-8">Cargando...</div>
-  <div *ngIf="error" class="bg-red-100 text-red-700 p-3 rounded">{{ error }}</div>
-
-  <!-- Tabla -->
-  <div *ngIf="!cargando && !error" class="overflow-x-auto">
-    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-      <thead class="bg-gray-100">
-      <tr>
-        <th class="px-4 py-2 text-left text-sm font-semibold">Documento</th>
-        <th class="px-4 py-2 text-left text-sm font-semibold">Nombre</th>
-        <th class="px-4 py-2 text-left text-sm font-semibold">Teléfono</th>
-        <th class="px-4 py-2 text-left text-sm font-semibold">Email</th>
-        <th class="px-4 py-2 text-left text-sm font-semibold">Dirección</th>
-        <th class="px-4 py-2 text-center text-sm font-semibold">Acciones</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let cliente of clientesFiltrados" class="border-t hover:bg-gray-50">
-        <td class="px-4 py-2 text-sm">{{ cliente.documento }}</td>
-        <td class="px-4 py-2 text-sm font-medium">{{ cliente.nombre }}</td>
-        <td class="px-4 py-2 text-sm">{{ cliente.telefono || '-' }}</td>
-        <td class="px-4 py-2 text-sm">{{ cliente.email || '-' }}</td>
-        <td class="px-4 py-2 text-sm">{{ cliente.direccion || '-' }}</td>
-        <td class="px-4 py-2 text-center">
-          <button (click)="editarCliente(cliente)" class="text-blue-600 hover:text-blue-800">
-            <span class="material-symbols-outlined text-base">edit</span>
-          </button>
-        </td>
-      </tr>
-      <tr *ngIf="clientesFiltrados.length === 0">
-        <td colspan="6" class="text-center py-4 text-gray-500">No hay clientes registrados</td>
-      </tr>
-      </tbody>
-    </table>
+  <!-- Tabla de clientes -->
+  <div class="bg-white rounded-xl shadow-sm border border-[#c4c6d1]/10 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-[#f2f4f7]">
+        <tr>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Documento</th>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre</th>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</th>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Email</th>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Dirección</th>
+          <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest text-right">Acciones</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-[#c4c6d1]/10">
+        <tr *ngIf="cargando">
+          <td colspan="6" class="px-6 py-12 text-center text-slate-400">Cargando clientes...</td>
+        </tr>
+        <tr *ngFor="let cliente of clientesFiltrados" class="hover:bg-[#f2f4f7] transition-colors">
+          <td class="px-6 py-4 text-sm text-[#44474f]">{{ cliente.documento }}</td>
+          <td class="px-6 py-4 text-sm font-medium text-[#00173d]">{{ cliente.nombre }}</td>
+          <td class="px-6 py-4 text-sm text-[#44474f]">{{ cliente.telefono || '-' }}</td>
+          <td class="px-6 py-4 text-sm text-[#44474f]">{{ cliente.email || '-' }}</td>
+          <td class="px-6 py-4 text-sm text-[#44474f]">{{ cliente.direccion || '-' }}</td>
+          <td class="px-6 py-4 text-right">
+            <button (click)="editarCliente(cliente)" class="p-2 hover:bg-white rounded-lg transition-all text-slate-400 hover:text-[#006970]">
+              <span class="material-symbols-outlined text-lg">edit</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="!cargando && clientesFiltrados.length === 0">
+          <td colspan="6" class="px-6 py-12 text-center text-slate-400">
+            <span class="material-symbols-outlined text-4xl block mb-2">inbox</span>
+            No hay clientes registrados
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<!-- Modal compartido -->
+<!-- MODAL DE FORMULARIO (usando el app-modal compartido) -->
 <app-modal
   [isOpen]="isModalOpen"
   [title]="modalTitle"
@@ -65,49 +80,79 @@
   (confirmed)="guardarCliente()"
   (cancelled)="cerrarModal()"
 >
-  <div class="space-y-4">
+  <div class="space-y-5">
     <!-- Documento -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-1">DOCUMENTO *</label>
-      <input type="text" [(ngModel)]="clienteForm.documento"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
-      <div *ngIf="errorFormDocumento" class="text-red-600 text-xs mt-1 flex items-center gap-1">
+    <div class="space-y-2">
+      <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Documento *</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">badge</span>
+        <input type="text" [(ngModel)]="clienteForm.documento"
+               class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+               placeholder="Ej. 1234567890" />
+      </div>
+      <div *ngIf="errorFormDocumento" class="text-red-500 text-xs mt-1 flex items-center gap-1">
         <span class="material-symbols-outlined text-sm">error</span> {{ errorFormDocumento }}
       </div>
     </div>
+
     <!-- Nombre -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-1">NOMBRE COMPLETO *</label>
-      <input type="text" [(ngModel)]="clienteForm.nombre"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
-      <div *ngIf="errorFormNombre" class="text-red-600 text-xs mt-1 flex items-center gap-1">
+    <div class="space-y-2">
+      <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre completo *</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">badge</span>
+        <input type="text" [(ngModel)]="clienteForm.nombre"
+               class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+               placeholder="Ej. Juan Pérez" />
+      </div>
+      <div *ngIf="errorFormNombre" class="text-red-500 text-xs mt-1 flex items-center gap-1">
         <span class="material-symbols-outlined text-sm">error</span> {{ errorFormNombre }}
       </div>
     </div>
+
     <!-- Teléfono -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-1">TELÉFONO</label>
-      <input type="text" [(ngModel)]="clienteForm.telefono"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
+    <div class="space-y-2">
+      <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">call</span>
+        <input type="text" [(ngModel)]="clienteForm.telefono"
+               class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+               placeholder="Ej. 3001234567" />
+      </div>
     </div>
-    <!-- Email -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-1">CORREO ELECTRÓNICO</label>
-      <input type="email" [(ngModel)]="clienteForm.email" (input)="validarEmailTiempoReal()"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
-      <div *ngIf="errorFormEmail" class="text-red-600 text-xs mt-1 flex items-center gap-1">
+
+    <!-- Email con validación en tiempo real -->
+    <div class="space-y-2">
+      <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Correo Electrónico</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
+        <input type="email" [(ngModel)]="clienteForm.email" (input)="validarEmailTiempoReal()"
+               class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+               [class.border]="errorFormEmail"
+               [class.border-red-500]="errorFormEmail"
+               placeholder="correo@ejemplo.com" />
+      </div>
+      <div *ngIf="errorFormEmail" class="text-red-500 text-xs mt-1 flex items-center gap-1">
         <span class="material-symbols-outlined text-sm">error</span> {{ errorFormEmail }}
       </div>
     </div>
+
     <!-- Dirección -->
-    <div>
-      <label class="block text-sm font-bold text-gray-700 mb-1">DIRECCIÓN</label>
-      <input type="text" [(ngModel)]="clienteForm.direccion"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#006970] focus:border-transparent" />
+    <div class="space-y-2">
+      <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Dirección</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">home</span>
+        <input type="text" [(ngModel)]="clienteForm.direccion"
+               class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all"
+               placeholder="Ej. Calle 123 # 45-67" />
+      </div>
     </div>
-    <p class="text-xs text-gray-500 flex items-center gap-1 mt-2">
-      <span class="material-symbols-outlined text-sm">info</span>
-      Los campos marcados con * son obligatorios.
-    </p>
+
+    <!-- Información de campos obligatorios -->
+    <div class="p-3 bg-[#006970]/5 rounded-xl border border-[#006970]/10 flex gap-2">
+      <span class="material-symbols-outlined text-[#006970] text-base">info</span>
+      <p class="text-xs text-[#44474f] leading-relaxed">
+        Los campos marcados con <strong class="text-[#ba1a1a]">*</strong> son obligatorios.
+      </p>
+    </div>
   </div>
 </app-modal>
