@@ -4,8 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Cliente {
-  id?: number;
-  documento: string;
+  documento: string;   // ← clave primaria
   nombre: string;
   telefono?: string;
   email?: string;
@@ -25,7 +24,8 @@ export class ClienteService {
     return this.http.post<Cliente>(`${this.api}/api/clientes`, cliente);
   }
 
-  actualizar(id: number, cliente: Cliente): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.api}/api/clientes/${id}`, cliente);
+  actualizar(documento: string, cliente: Cliente): Observable<Cliente> {
+    // PUT /api/clientes/{documento}
+    return this.http.put<Cliente>(`${this.api}/api/clientes/${documento}`, cliente);
   }
 }
