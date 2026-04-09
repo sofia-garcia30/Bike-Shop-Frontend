@@ -30,13 +30,61 @@ export class ListaClientesComponent implements OnInit {
     this.cargarClientes();
   }
 
-  cargarClientes() { /* igual que antes */ }
-  aplicarFiltro() { /* igual que antes */ }
-  abrirModalCrear() { /* igual que antes */ }
-  editarCliente(cliente: Cliente) { /* igual que antes */ }
-  cerrarModal() { /* igual que antes */ }
+  cargarClientes() {
+    this.cargando = true;
+    this.clienteService.listar().subscribe({
+      next: (data) => {
+        this.clientes = data;
+        this.aplicarFiltro();
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Error al cargar clientes';
+        this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
-  // Método de validación de email
+  aplicarFiltro() {
+    const term = this.filtroDocumento.trim().toLowerCase();
+    if (!term) {
+      this.clientesFiltrados = [...this.clientes];
+    } else {
+      this.clientesFiltrados = this.clientes.filter(c =>
+        c.documento?.toLowerCase().includes(term) ||
+        c.nombre?.toLowerCase().includes(term)
+      );
+    }
+    this.cdr.detectChanges();
+  }
+
+  abrirModalCrear() {
+    this.editando = false;
+    this.documentoOriginal = '';
+    this.clienteForm = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
+    this.errorForm = '';
+    this.showModal = true;
+    this.cdr.detectChanges();
+  }
+
+  editarCliente(cliente: Cliente) {
+    this.editando = true;
+    this.documentoOriginal = cliente.documento;
+    this.clienteForm = { ...cliente };
+    this.errorForm = '';
+    this.showModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarModal() {
+    this.showModal = false;
+    this.enviando = false;
+    this.errorForm = '';
+    this.cdr.detectChanges();
+  }
+
   esEmailValido(email: string): boolean {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -49,7 +97,6 @@ export class ListaClientesComponent implements OnInit {
       return;
     }
 
-    // Validar email si se proporcionó
     if (this.clienteForm.email && !this.esEmailValido(this.clienteForm.email)) {
       this.errorForm = 'Ingresa un email válido (ejemplo: correo@dominio.com)';
       this.cdr.detectChanges();
