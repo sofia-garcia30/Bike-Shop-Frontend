@@ -21,7 +21,7 @@ export class ListaClientesComponent implements OnInit {
   error = '';
 
   // Modal
-  showModal = false;
+  isModalOpen = false;
   editando = false;
   clienteForm: Cliente = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
   documentoOriginal = '';
@@ -35,9 +35,7 @@ export class ListaClientesComponent implements OnInit {
   // Configuración del modal
   modalTitle = '';
   modalSubtitle = '';
-  modalConfirmLabel = 'Guardar Cliente';
-  modalCancelLabel = 'Cancelar';
-  modalConfirmBtnClass = 'bg-[#006970] hover:bg-[#004d55]'; // color consistente con el tema
+  modalVariant = 'default';
 
   ngOnInit(): void {
     this.cargarClientes();
@@ -82,7 +80,8 @@ export class ListaClientesComponent implements OnInit {
     this.errorFormEmail = '';
     this.modalTitle = 'Nuevo Cliente';
     this.modalSubtitle = 'Registra un nuevo cliente en el sistema';
-    this.showModal = true;
+    this.modalVariant = 'default';
+    this.isModalOpen = true;
     this.cdr.detectChanges();
   }
 
@@ -95,12 +94,13 @@ export class ListaClientesComponent implements OnInit {
     this.errorFormEmail = '';
     this.modalTitle = 'Editar Cliente';
     this.modalSubtitle = 'Actualiza los datos del cliente';
-    this.showModal = true;
+    this.modalVariant = 'default';
+    this.isModalOpen = true;
     this.cdr.detectChanges();
   }
 
   cerrarModal() {
-    this.showModal = false;
+    this.isModalOpen = false;
     this.enviando = false;
     this.cdr.detectChanges();
   }
