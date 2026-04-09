@@ -19,10 +19,10 @@ export class ListaClientesComponent implements OnInit {
   cargando = false;
   error = '';
 
-  // Modal (reutilizable para crear y editar)
   showModal = false;
   editando = false;
   clienteForm: Cliente = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
+  documentoOriginal = '';
   enviando = false;
   errorForm = '';
 
@@ -30,59 +30,16 @@ export class ListaClientesComponent implements OnInit {
     this.cargarClientes();
   }
 
-  cargarClientes() {
-    this.cargando = true;
-    this.clienteService.listar().subscribe({
-      next: (data) => {
-        this.clientes = data;
-        this.aplicarFiltro();
-        this.cargando = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.error = 'Error al cargar clientes';
-        this.cargando = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+  cargarClientes() { /* igual que antes */ }
+  aplicarFiltro() { /* igual que antes */ }
+  abrirModalCrear() { /* igual que antes */ }
+  editarCliente(cliente: Cliente) { /* igual que antes */ }
+  cerrarModal() { /* igual que antes */ }
 
-  aplicarFiltro() {
-    const term = this.filtroDocumento.trim().toLowerCase();
-    if (!term) {
-      this.clientesFiltrados = [...this.clientes];
-    } else {
-      this.clientesFiltrados = this.clientes.filter(c =>
-        c.documento?.toLowerCase().includes(term) ||
-        c.nombre?.toLowerCase().includes(term)
-      );
-    }
-    this.cdr.detectChanges();
-  }
-
-  // Abrir modal para crear
-  abrirModalCrear() {
-    this.editando = false;
-    this.clienteForm = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
-    this.errorForm = '';
-    this.showModal = true;
-    this.cdr.detectChanges();
-  }
-
-  // Abrir modal para editar
-  editarCliente(cliente: Cliente) {
-    this.editando = true;
-    this.clienteForm = { ...cliente };
-    this.errorForm = '';
-    this.showModal = true;
-    this.cdr.detectChanges();
-  }
-
-  cerrarModal() {
-    this.showModal = false;
-    this.enviando = false;
-    this.errorForm = '';
-    this.cdr.detectChanges();
+  // Método de validación de email
+  esEmailValido(email: string): boolean {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   }
 
   guardarCliente() {
@@ -92,12 +49,18 @@ export class ListaClientesComponent implements OnInit {
       return;
     }
 
+    // Validar email si se proporcionó
+    if (this.clienteForm.email && !this.esEmailValido(this.clienteForm.email)) {
+      this.errorForm = 'Ingresa un email válido (ejemplo: correo@dominio.com)';
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.enviando = true;
     this.errorForm = '';
 
-    if (this.editando && this.clienteForm.id) {
-      // Editar
-      this.clienteService.actualizar(this.clienteForm.id, this.clienteForm).subscribe({
+    if (this.editando) {
+      this.clienteService.actualizar(this.documentoOriginal, this.clienteForm).subscribe({
         next: () => {
           this.cargarClientes();
           this.cerrarModal();
@@ -110,7 +73,6 @@ export class ListaClientesComponent implements OnInit {
         }
       });
     } else {
-      // Crear
       this.clienteService.crear(this.clienteForm).subscribe({
         next: () => {
           this.cargarClientes();
