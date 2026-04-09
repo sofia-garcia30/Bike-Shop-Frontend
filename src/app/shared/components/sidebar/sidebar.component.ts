@@ -23,6 +23,7 @@ export class SidebarComponent {
     { label: 'Pedidos', icon: 'shopping_cart', route: '/pedidos', roles: ['ADMIN', 'EMPLEADO'] },
     { label: 'Proveedores', icon: 'group', route: '/proveedores', roles: ['ADMIN'] },
     { label: 'Usuarios', icon: 'person', route: '/usuarios', roles: ['ADMIN'] },
+    { label: 'Clientes', icon: 'people', route: '/clientes', roles: ['ADMIN', 'EMPLEADO'] },
   ];
 
   get itemsVisibles() {
