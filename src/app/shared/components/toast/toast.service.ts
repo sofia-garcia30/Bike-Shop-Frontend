@@ -10,7 +10,7 @@ export class ToastService {
   toast$ = this._toast$.asObservable();
   private nextId = 0;
 
-  show(message: string, type: ToastType = 'success', duration = 1500): void {
+  show(message: string, type: ToastType = 'success', duration = 2500): void {
     this._toast$.next({ id: this.nextId++, type, message, duration });
   }
 
