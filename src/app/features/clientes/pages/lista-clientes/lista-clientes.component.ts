@@ -2,7 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClienteService, Cliente } from '../../../../core/services/cliente.service';
-import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { ModalComponent, ModalVariant } from '../../../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-lista-clientes',
@@ -20,22 +20,19 @@ export class ListaClientesComponent implements OnInit {
   cargando = false;
   error = '';
 
-  // Modal
   isModalOpen = false;
   editando = false;
   clienteForm: Cliente = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
   documentoOriginal = '';
   enviando = false;
 
-  // Errores individuales
   errorFormDocumento = '';
   errorFormNombre = '';
   errorFormEmail = '';
 
-  // Configuración del modal
   modalTitle = '';
   modalSubtitle = '';
-  modalVariant = 'default';
+  modalVariant: ModalVariant = 'default';  // ← tipado correcto
 
   ngOnInit(): void {
     this.cargarClientes();
