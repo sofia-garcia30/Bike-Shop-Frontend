@@ -24,12 +24,13 @@ export class ToastComponent implements OnInit, OnDestroy {
   private timer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    // Pequeño delay para que el enter animation se dispare
-    requestAnimationFrame(() => (this.visible = true));
+    // Aparece inmediatamente sin delay
+    this.visible = true;
 
+    const duration = this.toast.duration ?? 2000;
     this.timer = setTimeout(() => {
       this.close();
-    }, this.toast.duration ?? 3000);
+    }, duration);
   }
 
   ngOnDestroy(): void {
@@ -38,8 +39,8 @@ export class ToastComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.visible = false;
-    // Esperar la animación de salida antes de emitir
-    setTimeout(() => this.dismiss.emit(this.toast.id), 300);
+    // Salida más rápida
+    setTimeout(() => this.dismiss.emit(this.toast.id), 150);
   }
 
   get config(): { icon: string; classes: string; bar: string } {
