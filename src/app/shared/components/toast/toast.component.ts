@@ -8,7 +8,7 @@ import { Toast } from './toast.model';
   imports: [CommonModule],
   template: `
     <div
-      class="fixed top-4 right-4 z-[9999] flex items-start gap-3 w-80 rounded-xl shadow-lg px-4 py-4 transition-all duration-150 overflow-hidden"
+      class="fixed bottom-4 right-4 z-[9999] flex items-start gap-3 w-80 rounded-xl shadow-lg px-4 py-4 transition-all duration-150 overflow-hidden"
       [ngClass]="[config.classes, 'animate-slide-in']"
       role="alert"
     >
