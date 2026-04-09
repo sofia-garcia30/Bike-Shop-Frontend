@@ -13,18 +13,24 @@ export class ListaClientesComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private cdr = inject(ChangeDetectorRef);
 
+  // Listado y filtro
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
   filtroDocumento = '';
   cargando = false;
   error = '';
 
+  // Modal
   showModal = false;
   editando = false;
   clienteForm: Cliente = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
   documentoOriginal = '';
   enviando = false;
-  errorForm = '';
+
+  // Errores individuales por campo
+  errorFormDocumento = '';
+  errorFormNombre = '';
+  errorFormEmail = '';
 
   ngOnInit(): void {
     this.cargarClientes();
@@ -64,7 +70,9 @@ export class ListaClientesComponent implements OnInit {
     this.editando = false;
     this.documentoOriginal = '';
     this.clienteForm = { documento: '', nombre: '', telefono: '', email: '', direccion: '' };
-    this.errorForm = '';
+    this.errorFormDocumento = '';
+    this.errorFormNombre = '';
+    this.errorFormEmail = '';
     this.showModal = true;
     this.cdr.detectChanges();
   }
@@ -73,7 +81,9 @@ export class ListaClientesComponent implements OnInit {
     this.editando = true;
     this.documentoOriginal = cliente.documento;
     this.clienteForm = { ...cliente };
-    this.errorForm = '';
+    this.errorFormDocumento = '';
+    this.errorFormNombre = '';
+    this.errorFormEmail = '';
     this.showModal = true;
     this.cdr.detectChanges();
   }
@@ -81,7 +91,9 @@ export class ListaClientesComponent implements OnInit {
   cerrarModal() {
     this.showModal = false;
     this.enviando = false;
-    this.errorForm = '';
+    this.errorFormDocumento = '';
+    this.errorFormNombre = '';
+    this.errorFormEmail = '';
     this.cdr.detectChanges();
   }
 
@@ -90,21 +102,40 @@ export class ListaClientesComponent implements OnInit {
     return regex.test(email);
   }
 
+  validarEmailTiempoReal() {
+    const email = this.clienteForm.email;
+    if (email && !this.esEmailValido(email)) {
+      this.errorFormEmail = 'Ingresa un email válido (ej: usuario@correo.com)';
+    } else {
+      this.errorFormEmail = '';
+    }
+    this.cdr.detectChanges();
+  }
+
   guardarCliente() {
-    if (!this.clienteForm.documento || !this.clienteForm.nombre) {
-      this.errorForm = 'Documento y nombre son obligatorios';
+    // Resetear errores
+    this.errorFormDocumento = '';
+    this.errorFormNombre = '';
+    this.errorFormEmail = '';
+
+    // Validaciones
+    if (!this.clienteForm.documento) {
+      this.errorFormDocumento = 'El documento es obligatorio';
       this.cdr.detectChanges();
       return;
     }
-
+    if (!this.clienteForm.nombre) {
+      this.errorFormNombre = 'El nombre es obligatorio';
+      this.cdr.detectChanges();
+      return;
+    }
     if (this.clienteForm.email && !this.esEmailValido(this.clienteForm.email)) {
-      this.errorForm = 'Ingresa un email válido (ejemplo: correo@dominio.com)';
+      this.errorFormEmail = 'Ingresa un email válido (ej: usuario@correo.com)';
       this.cdr.detectChanges();
       return;
     }
 
     this.enviando = true;
-    this.errorForm = '';
 
     if (this.editando) {
       this.clienteService.actualizar(this.documentoOriginal, this.clienteForm).subscribe({
@@ -114,7 +145,7 @@ export class ListaClientesComponent implements OnInit {
           this.enviando = false;
         },
         error: (err) => {
-          this.errorForm = err.error?.mensaje || 'Error al actualizar';
+          this.errorFormDocumento = err.error?.mensaje || 'Error al actualizar';
           this.enviando = false;
           this.cdr.detectChanges();
         }
@@ -127,7 +158,7 @@ export class ListaClientesComponent implements OnInit {
           this.enviando = false;
         },
         error: (err) => {
-          this.errorForm = err.error?.mensaje || 'Error al crear';
+          this.errorFormDocumento = err.error?.mensaje || 'Error al crear';
           this.enviando = false;
           this.cdr.detectChanges();
         }
