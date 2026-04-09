@@ -2,18 +2,18 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClienteService, Cliente } from '../../../../core/services/cliente.service';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-lista-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalComponent],
   templateUrl: './lista-clientes.component.html'
 })
 export class ListaClientesComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private cdr = inject(ChangeDetectorRef);
 
-  // Listado y filtro
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
   filtroDocumento = '';
@@ -27,10 +27,17 @@ export class ListaClientesComponent implements OnInit {
   documentoOriginal = '';
   enviando = false;
 
-  // Errores individuales por campo
+  // Errores individuales
   errorFormDocumento = '';
   errorFormNombre = '';
   errorFormEmail = '';
+
+  // Configuración del modal
+  modalTitle = '';
+  modalSubtitle = '';
+  modalConfirmLabel = 'Guardar Cliente';
+  modalCancelLabel = 'Cancelar';
+  modalConfirmBtnClass = 'bg-[#006970] hover:bg-[#004d55]'; // color consistente con el tema
 
   ngOnInit(): void {
     this.cargarClientes();
@@ -73,6 +80,8 @@ export class ListaClientesComponent implements OnInit {
     this.errorFormDocumento = '';
     this.errorFormNombre = '';
     this.errorFormEmail = '';
+    this.modalTitle = 'Nuevo Cliente';
+    this.modalSubtitle = 'Registra un nuevo cliente en el sistema';
     this.showModal = true;
     this.cdr.detectChanges();
   }
@@ -84,6 +93,8 @@ export class ListaClientesComponent implements OnInit {
     this.errorFormDocumento = '';
     this.errorFormNombre = '';
     this.errorFormEmail = '';
+    this.modalTitle = 'Editar Cliente';
+    this.modalSubtitle = 'Actualiza los datos del cliente';
     this.showModal = true;
     this.cdr.detectChanges();
   }
@@ -91,9 +102,6 @@ export class ListaClientesComponent implements OnInit {
   cerrarModal() {
     this.showModal = false;
     this.enviando = false;
-    this.errorFormDocumento = '';
-    this.errorFormNombre = '';
-    this.errorFormEmail = '';
     this.cdr.detectChanges();
   }
 
@@ -113,12 +121,10 @@ export class ListaClientesComponent implements OnInit {
   }
 
   guardarCliente() {
-    // Resetear errores
     this.errorFormDocumento = '';
     this.errorFormNombre = '';
     this.errorFormEmail = '';
 
-    // Validaciones
     if (!this.clienteForm.documento) {
       this.errorFormDocumento = 'El documento es obligatorio';
       this.cdr.detectChanges();
