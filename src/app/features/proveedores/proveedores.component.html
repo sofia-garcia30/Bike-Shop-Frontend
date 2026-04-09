@@ -80,83 +80,92 @@
     </div>
   </div>
 </div>
-
 <!-- 🔥 MODAL PROFESIONAL (mismo estilo que Pedidos) -->
-<div class="fixed inset-0 z-50 flex items-center justify-center px-4" *ngIf="mostrarFormulario">
+<div class="fixed inset-0 z-50 flex items-start justify-center p-4" *ngIf="mostrarFormulario">
   <div class="absolute inset-0 bg-[#0b2b5e]/40 backdrop-blur-md" (click)="cancelarFormulario()"></div>
-  <div class="relative w-full max-w-xl bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] overflow-hidden border border-white/20">
-    <!-- Modal Header -->
-    <div class="px-8 py-6 bg-[#0b2b5e] text-white flex justify-between items-center">
-      <div>
-        <h3 class="text-xl font-bold tracking-tight">{{ proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h3>
-        <p class="text-white/60 text-xs font-medium uppercase tracking-widest mt-1">Configuración de Acceso</p>
+  <div class="relative w-full max-w-md bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] border border-white/20 mt-16 mb-8">
+    <div class="overflow-y-auto max-h-[75vh]">
+      <!-- Modal Header -->
+      <div class="px-6 py-5 bg-[#0b2b5e] text-white flex justify-between items-center sticky top-0 rounded-t-xl">
+        <div>
+          <h3 class="text-xl font-bold tracking-tight">{{ proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h3>
+          <p class="text-white/60 text-xs font-medium uppercase tracking-widest mt-1">Configuración de Acceso</p>
+        </div>
+        <button (click)="cancelarFormulario()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <button (click)="cancelarFormulario()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-    
-    <!-- Modal Body -->
-    <div class="p-8">
-      <div class="space-y-6">
-        <!-- Nombre -->
-        <div class="space-y-2">
-          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre completo *</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">badge</span>
-            <input type="text" [(ngModel)]="nuevoProveedor.nombre" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="Ej. GW Bikes" />
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        <div class="space-y-5">
+          <!-- Nombre -->
+          <div class="space-y-2">
+            <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Nombre completo *</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">badge</span>
+              <input type="text" [(ngModel)]="nuevoProveedor.nombre" class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="Ej. GW Bikes" />
+            </div>
           </div>
-        </div>
 
-        <!-- Teléfono -->
-        <div class="space-y-2">
-          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">call</span>
-            <input type="tel" [(ngModel)]="nuevoProveedor.telefono" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="3001234567" />
+          <!-- Teléfono -->
+          <div class="space-y-2">
+            <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Teléfono</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">call</span>
+              <input type="tel" [(ngModel)]="nuevoProveedor.telefono" (input)="validarTelefonoTiempoReal()" class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" [class.border-red-500]="telefonoInvalido" placeholder="3001234567" />
+            </div>
+            <div *ngIf="telefonoInvalido && nuevoProveedor.telefono" class="text-red-500 text-xs mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">error</span>
+              El teléfono solo debe contener números
+            </div>
           </div>
-        </div>
 
-        <!-- Email -->
-        <div class="space-y-2">
-          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Correo Electrónico</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
-            <input type="email" [(ngModel)]="nuevoProveedor.email" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" placeholder="ventas@gwbikes.com" />
+          <!-- Email -->
+          <div class="space-y-2">
+            <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Correo Electrónico</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">mail</span>
+              <input type="email" [(ngModel)]="nuevoProveedor.email" (input)="validarEmailTiempoReal()" class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all" [class.border-red-500]="emailInvalido" placeholder="ventas@gwbikes.com" />
+            </div>
+            <div *ngIf="emailInvalido && nuevoProveedor.email" class="text-red-500 text-xs mt-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">error</span>
+              Ingresa un email válido (ej: usuario@correo.com)
+            </div>
           </div>
-        </div>
 
-        <!-- Frecuencia de Entrega -->
-        <div class="space-y-2">
-          <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Frecuencia de Entrega</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">schedule</span>
-            <select [(ngModel)]="nuevoProveedor.frecuenciaEntrega" class="w-full pl-10 pr-4 py-3 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all appearance-none">
-              <option value="SEMANAL">Semanal</option>
-              <option value="QUINCENAL">Quincenal</option>
-              <option value="MENSUAL">Mensual</option>
-            </select>
-            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+          <!-- Frecuencia de Entrega -->
+          <div class="space-y-2">
+            <label class="block text-[0.7rem] font-bold text-slate-500 uppercase tracking-widest">Frecuencia de Entrega</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">schedule</span>
+              <select [(ngModel)]="nuevoProveedor.frecuenciaEntrega" class="w-full pl-10 pr-4 py-2.5 bg-[#f2f4f7] border-none rounded-xl text-sm focus:ring-2 focus:ring-[#006970]/30 transition-all appearance-none">
+                <option value="SEMANAL">Semanal</option>
+                <option value="QUINCENAL">Quincenal</option>
+                <option value="MENSUAL">Mensual</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+            </div>
           </div>
-        </div>
 
-        <!-- Nota informativa -->
-        <div class="p-4 bg-[#006970]/5 rounded-xl border border-[#006970]/10 flex gap-3">
-          <span class="material-symbols-outlined text-[#006970] text-lg">info</span>
-          <p class="text-xs text-[#44474f] leading-relaxed">
-            Los campos marcados con <strong class="text-[#ba1a1a]">*</strong> son obligatorios.
-          </p>
-        </div>
+          <!-- Nota informativa -->
+          <div class="p-3 bg-[#006970]/5 rounded-xl border border-[#006970]/10 flex gap-2">
+            <span class="material-symbols-outlined text-[#006970] text-base">info</span>
+            <p class="text-xs text-[#44474f] leading-relaxed">
+              Los campos marcados con <strong class="text-[#ba1a1a]">*</strong> son obligatorios.
+            </p>
+          </div>
 
-        <!-- Modal Footer Actions -->
-        <div class="flex justify-end gap-3 pt-2">
-          <button (click)="cancelarFormulario()" class="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-[#00173d] transition-colors rounded-xl hover:bg-[#f2f4f7]">
-            Cancelar
-          </button>
-          <button (click)="guardarProveedor()" class="px-8 py-2.5 bg-[#006970] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#006970]/20 hover:bg-[#005a61] active:scale-95 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">save</span>
-            {{ proveedorEditando ? 'Actualizar' : 'Guardar' }}
-          </button>
+          <!-- Modal Footer Actions -->
+          <div class="flex justify-end gap-3 pt-2">
+            <button (click)="cancelarFormulario()" class="px-5 py-2 text-sm font-semibold text-slate-500 hover:text-[#00173d] transition-colors rounded-xl hover:bg-[#f2f4f7]">
+              Cancelar
+            </button>
+            <button (click)="guardarProveedor()" class="px-6 py-2 bg-[#006970] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#006970]/20 hover:bg-[#005a61] active:scale-95 transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">save</span>
+              {{ proveedorEditando ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -20,6 +20,8 @@ export class ProveedoresComponent implements OnInit {
   loading = true;
   filtroBusqueda: string = '';
 proveedoresFiltrados: Proveedor[] = [];
+emailInvalido = false;
+telefonoInvalido = false;
 
   // Variables para el modal de eliminación
   showDeleteModal = false;
@@ -81,48 +83,63 @@ cargarProveedores(): void {
       frecuenciaEntrega: proveedor.frecuenciaEntrega
     };
   }
+guardarProveedor(): void {
+  // Validaciones en tiempo real
+  this.validarEmailTiempoReal();
+  this.validarTelefonoTiempoReal();
 
-  guardarProveedor(): void {
-    if (!this.nuevoProveedor.nombre?.trim()) {
-      this.toast.warning('El nombre del proveedor es obligatorio');
-      return;
-    }
-
-    if (this.proveedorEditando) {
-      this.proveedorService.actualizar(this.proveedorEditando.id, this.nuevoProveedor).subscribe({
-        next: (respuesta) => {
-          const index = this.proveedores.findIndex(p => p.id === this.proveedorEditando!.id);
-          if (index !== -1) {
-            this.proveedores[index] = { ...this.proveedores[index], ...this.nuevoProveedor };
-            this.proveedores = [...this.proveedores];
-          }
-          this.mostrarFormulario = false;
-          this.proveedorEditando = null;
-          this.nuevoProveedor = { nombre: '', telefono: '', email: '', frecuenciaEntrega: 'SEMANAL' };
-          this.toast.success('Proveedor actualizado correctamente');
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error actualizando:', err);
-          this.toast.error('Error al actualizar el proveedor');
-        }
-      });
-    } else {
-      this.proveedorService.crear(this.nuevoProveedor).subscribe({
-        next: (respuesta) => {
-          this.proveedores = [...this.proveedores, respuesta];
-          this.mostrarFormulario = false;
-          this.nuevoProveedor = { nombre: '', telefono: '', email: '', frecuenciaEntrega: 'SEMANAL' };
-          this.toast.success('Proveedor creado correctamente');
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error creando:', err);
-          this.toast.error('Error al crear el proveedor');
-        }
-      });
-    }
+  if (!this.nuevoProveedor.nombre?.trim()) {
+    this.toast.warning('El nombre del proveedor es obligatorio');
+    return;
   }
+
+  // Validar email solo si fue ingresado
+  if (this.nuevoProveedor.email && this.emailInvalido) {
+    this.toast.warning('Ingresa un email válido');
+    return;
+  }
+
+  // Validar teléfono solo si fue ingresado
+  if (this.nuevoProveedor.telefono && this.telefonoInvalido) {
+    this.toast.warning('El teléfono solo debe contener números');
+    return;
+  }
+
+  if (this.proveedorEditando) {
+    this.proveedorService.actualizar(this.proveedorEditando.id, this.nuevoProveedor).subscribe({
+      next: (respuesta) => {
+        const index = this.proveedores.findIndex(p => p.id === this.proveedorEditando!.id);
+        if (index !== -1) {
+          this.proveedores[index] = { ...this.proveedores[index], ...this.nuevoProveedor };
+          this.proveedores = [...this.proveedores];
+        }
+        this.mostrarFormulario = false;
+        this.proveedorEditando = null;
+        this.nuevoProveedor = { nombre: '', telefono: '', email: '', frecuenciaEntrega: 'SEMANAL' };
+        this.toast.success('Proveedor actualizado correctamente');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error actualizando:', err);
+        this.toast.error('Error al actualizar el proveedor');
+      }
+    });
+  } else {
+    this.proveedorService.crear(this.nuevoProveedor).subscribe({
+      next: (respuesta) => {
+        this.proveedores = [...this.proveedores, respuesta];
+        this.mostrarFormulario = false;
+        this.nuevoProveedor = { nombre: '', telefono: '', email: '', frecuenciaEntrega: 'SEMANAL' };
+        this.toast.success('Proveedor creado correctamente');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error creando:', err);
+        this.toast.error('Error al crear el proveedor');
+      }
+    });
+  }
+}
 
   // Abrir modal de confirmación para eliminar
   confirmarEliminar(proveedor: Proveedor): void {
@@ -182,6 +199,24 @@ cargarProveedores(): void {
     this.proveedoresFiltrados = this.proveedores.filter(prov => 
       prov.nombre.toLowerCase().includes(busqueda)
     );
+  }
+}
+
+validarEmailTiempoReal(): void {
+  if (this.nuevoProveedor.email) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    this.emailInvalido = !regex.test(this.nuevoProveedor.email);
+  } else {
+    this.emailInvalido = false;
+  }
+}
+
+validarTelefonoTiempoReal(): void {
+  if (this.nuevoProveedor.telefono) {
+    const soloNumeros = /^\d+$/;
+    this.telefonoInvalido = !soloNumeros.test(this.nuevoProveedor.telefono);
+  } else {
+    this.telefonoInvalido = false;
   }
 }
 
